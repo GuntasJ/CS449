@@ -7,7 +7,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -23,55 +22,56 @@ public class GamePanel extends JPanel {
     private final JPanel eastPanel;
     private final JPanel centerPanel;
     private final JPanel southPanel;
+
     private final ButtonGroup topButtons;
     private final JRadioButton gameTypeSimpleRadioButton;
     private final JRadioButton gameTypeGeneralRadioButton;
+
     private final JLabel buttonGroupLabel;
     private final JLabel boardSizeLabel;
+
     private final JTextField boardSizeTextField;
+
+    private final JButton newGameButton;
+
+    private int gameSize = 3;
 
 
     GamePanel() {
         topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 13));
         westPanel = new JPanel();
         eastPanel = new JPanel();
-        centerPanel = new JPanel();
-        southPanel = new JPanel();
-        topButtons = new ButtonGroup();
+        centerPanel = new JPanel(new GridLayout(3, 3));
+        southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+
         buttonGroupLabel = new JLabel();
+        boardSizeLabel = new JLabel("Board Size: ");
+
+        topButtons = new ButtonGroup();
         gameTypeGeneralRadioButton = new JRadioButton("General Game");
         gameTypeSimpleRadioButton = new JRadioButton("Simple Game");
-        boardSizeLabel = new JLabel("Board Size: ");
+
         boardSizeTextField = new JTextField();
+
+        newGameButton = new JButton("New Game");
 
         //setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         setLayout(new BorderLayout());
         setPreferredSize(GraphicConstants.GAME_PANEL_BOUNDS);
         setBackground(Color.BLACK);
-        setUpTopPanelAndComponents();
 
-        westPanel.setBackground(Color.BLUE);
-        westPanel.setPreferredSize(new Dimension(200, 200));
-        add(westPanel, BorderLayout.WEST);
-
-        eastPanel.setBackground(Color.RED);
-        eastPanel.setPreferredSize(new Dimension(200, 200));
-        add(eastPanel, BorderLayout.EAST);
-
-        centerPanel.setBackground(Color.WHITE);
-        centerPanel.setPreferredSize(new Dimension(200, 200));
-        add(centerPanel, BorderLayout.CENTER);
-
-        southPanel.setBackground(Color.GRAY);
-        southPanel.setPreferredSize(new Dimension(100, 200));
-        add(southPanel, BorderLayout.SOUTH);
+        setUpNorthPanelAndComponents();
+        setUpEastPanelAndComponents();
+        setUpWestPanelAndComponents();
+        setUpCenterPanelAndComponents();
+        setUpSouthPanelAndComponents();
 
     }
 
-    private void setUpTopPanelAndComponents() {
+    private void setUpNorthPanelAndComponents() {
         //top panel
-        topPanel.setBackground(Color.GRAY);
-        topPanel.setPreferredSize(GraphicConstants.TOP_PANEL_BOUNDS);
+        topPanel.setBackground(Color.DARK_GRAY);
+        topPanel.setPreferredSize(GraphicConstants.NORTH_PANEL_BOUNDS);
 
         //labels
         buttonGroupLabel.setText("SOS: ");
@@ -82,10 +82,13 @@ public class GamePanel extends JPanel {
         //radio buttons
         gameTypeSimpleRadioButton.setPreferredSize(GraphicConstants.RADIO_BUTTON_GAME_TYPE_BOUNDS);
         gameTypeGeneralRadioButton.setPreferredSize(GraphicConstants.RADIO_BUTTON_GAME_TYPE_BOUNDS);
+        gameTypeSimpleRadioButton.setFocusPainted(false);
+        gameTypeGeneralRadioButton.setFocusPainted(false);
 
         //Text field
         boardSizeTextField.setPreferredSize(GraphicConstants.TEXT_FIELD_BOUNDS);
         boardSizeTextField.setEditable(true);
+
 
         //adding them
 
@@ -105,14 +108,43 @@ public class GamePanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
     }
 
-    private void setUpMiddleLeftPanelAndComponents() {
+    private void setUpEastPanelAndComponents() {
+        eastPanel.setBackground(Color.RED);
+        eastPanel.setPreferredSize(new Dimension(150, 200));
+        add(eastPanel, BorderLayout.EAST);
+    }
+    private void setUpWestPanelAndComponents() {
+        westPanel.setBackground(Color.BLUE);
+        westPanel.setPreferredSize(new Dimension(150, 200));
+        add(westPanel, BorderLayout.WEST);
 
     }
-    private void setUpMiddleRightPanelAndComponents() {
+    private void setUpSouthPanelAndComponents() {
+        newGameButton.setPreferredSize(GraphicConstants.NEW_GAME_BUTTON_BOUNDS);
+        newGameButton.setFocusPainted(false);
+        newGameButton.addActionListener(e -> {
+            gameSize = Integer.parseInt(boardSizeTextField.getText());
+            centerPanel.removeAll();
+            centerPanel.setLayout(new GridLayout(gameSize, gameSize));
+            for(int i = 0; i < Math.pow(gameSize, 2); i++) {
+                centerPanel.add(new SOSGameTile(i));
+            }
+            centerPanel.revalidate();
+        });
+        southPanel.add(newGameButton);
+
+
+        southPanel.setBackground(Color.DARK_GRAY);
+        southPanel.setPreferredSize(GraphicConstants.SOUTH_PANEL_BOUNDS);
+        add(southPanel, BorderLayout.SOUTH);
 
     }
-    private void setUpSOSPanel() {
+    private void setUpCenterPanelAndComponents() {
+        centerPanel.setBackground(Color.BLACK);
+        centerPanel.setPreferredSize(GraphicConstants.CENTER_PANEL_BOUNDS);
 
+
+        add(centerPanel, BorderLayout.CENTER);
     }
     @Override
     public void paintComponent(Graphics g) {
@@ -121,9 +153,13 @@ public class GamePanel extends JPanel {
 
     private class SOSGameTile extends JPanel {
 
-        public SOSGameTile() {
-            this.setBackground(Color.BLACK);
-            this.setBorder(BorderFactory.createLineBorder(Color.WHITE, 5));
+        private final int index;
+
+        public SOSGameTile(int index) {
+            this.index = index;
+            setBackground(Color.BLACK);
+            setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.ORANGE));
+
         }
     }
 
