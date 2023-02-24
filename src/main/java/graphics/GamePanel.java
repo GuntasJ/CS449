@@ -1,23 +1,33 @@
 package graphics;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 public class GamePanel extends JPanel {
 
-    private final JPanel topPanel;
+    private final JPanel northPanel;
     private final JPanel westPanel;
     private final JPanel eastPanel;
     private final JPanel centerPanel;
@@ -29,16 +39,21 @@ public class GamePanel extends JPanel {
 
     private final JLabel buttonGroupLabel;
     private final JLabel boardSizeLabel;
+    private final JLabel redPlayerLabel;
+    private final JLabel bluePlayerLabel;
 
     private final JTextField boardSizeTextField;
 
     private final JButton newGameButton;
 
+    private final ActionListener makeSOSTiles;
+
     private int gameSize = 3;
 
 
     GamePanel() {
-        topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 13));
+
+        northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 13));
         westPanel = new JPanel();
         eastPanel = new JPanel();
         centerPanel = new JPanel(new GridLayout(3, 3));
@@ -46,6 +61,8 @@ public class GamePanel extends JPanel {
 
         buttonGroupLabel = new JLabel();
         boardSizeLabel = new JLabel("Board Size: ");
+        redPlayerLabel = new JLabel("Red Player");
+        bluePlayerLabel = new JLabel("Blue Player");
 
         topButtons = new ButtonGroup();
         gameTypeGeneralRadioButton = new JRadioButton("General Game");
@@ -55,7 +72,16 @@ public class GamePanel extends JPanel {
 
         newGameButton = new JButton("New Game");
 
-        //setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        makeSOSTiles = e -> {
+            gameSize = Integer.parseInt(boardSizeTextField.getText());
+            centerPanel.removeAll();
+            centerPanel.setLayout(new GridLayout(gameSize, gameSize));
+            for(int i = 0; i < Math.pow(gameSize, 2); i++) {
+                centerPanel.add(new SOSGameTile(i));
+            }
+            centerPanel.revalidate();
+        };
+
         setLayout(new BorderLayout());
         setPreferredSize(GraphicConstants.GAME_PANEL_BOUNDS);
         setBackground(Color.BLACK);
@@ -70,8 +96,7 @@ public class GamePanel extends JPanel {
 
     private void setUpNorthPanelAndComponents() {
         //top panel
-        topPanel.setBackground(Color.DARK_GRAY);
-        topPanel.setPreferredSize(GraphicConstants.NORTH_PANEL_BOUNDS);
+        northPanel.setPreferredSize(GraphicConstants.NORTH_PANEL_BOUNDS);
 
         //labels
         buttonGroupLabel.setText("SOS: ");
@@ -88,53 +113,63 @@ public class GamePanel extends JPanel {
         //Text field
         boardSizeTextField.setPreferredSize(GraphicConstants.TEXT_FIELD_BOUNDS);
         boardSizeTextField.setEditable(true);
+        boardSizeTextField.addActionListener(makeSOSTiles);
 
 
         //adding them
 
-        topPanel.add(buttonGroupLabel);
 
+        northPanel.add(buttonGroupLabel);
 
         topButtons.add(gameTypeSimpleRadioButton);
         topButtons.add(gameTypeGeneralRadioButton);
-        topPanel.add(gameTypeSimpleRadioButton);
-        topPanel.add(gameTypeGeneralRadioButton);
+        northPanel.add(gameTypeSimpleRadioButton);
+        northPanel.add(gameTypeGeneralRadioButton);
+
+        northPanel.add(Box.createRigidArea(new Dimension(250, 0)));
+
+        northPanel.add(boardSizeLabel);
+
+        northPanel.add(boardSizeTextField);
 
 
-        topPanel.add(boardSizeLabel);
-
-        topPanel.add(boardSizeTextField);
-
-        add(topPanel, BorderLayout.NORTH);
+        add(northPanel, BorderLayout.NORTH);
     }
 
     private void setUpEastPanelAndComponents() {
-        eastPanel.setBackground(Color.RED);
+        eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.Y_AXIS));
         eastPanel.setPreferredSize(new Dimension(150, 200));
+
+        redPlayerLabel.setAlignmentX(CENTER_ALIGNMENT);
+
+        eastPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+
+        eastPanel.add(redPlayerLabel);
+
         add(eastPanel, BorderLayout.EAST);
     }
     private void setUpWestPanelAndComponents() {
-        westPanel.setBackground(Color.BLUE);
+        westPanel.setLayout(new BoxLayout(westPanel, BoxLayout.Y_AXIS));
         westPanel.setPreferredSize(new Dimension(150, 200));
+
+        bluePlayerLabel.setAlignmentX(CENTER_ALIGNMENT);
+        bluePlayerLabel.setFont(bluePlayerLabel.getFont().deriveFont(20f));
+
+        westPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+
+        westPanel.add(bluePlayerLabel);
+
         add(westPanel, BorderLayout.WEST);
 
     }
     private void setUpSouthPanelAndComponents() {
         newGameButton.setPreferredSize(GraphicConstants.NEW_GAME_BUTTON_BOUNDS);
         newGameButton.setFocusPainted(false);
-        newGameButton.addActionListener(e -> {
-            gameSize = Integer.parseInt(boardSizeTextField.getText());
-            centerPanel.removeAll();
-            centerPanel.setLayout(new GridLayout(gameSize, gameSize));
-            for(int i = 0; i < Math.pow(gameSize, 2); i++) {
-                centerPanel.add(new SOSGameTile(i));
-            }
-            centerPanel.revalidate();
-        });
+        newGameButton.addActionListener(makeSOSTiles);
         southPanel.add(newGameButton);
 
 
-        southPanel.setBackground(Color.DARK_GRAY);
+        //southPanel.setBackground(Color.DARK_GRAY);
         southPanel.setPreferredSize(GraphicConstants.SOUTH_PANEL_BOUNDS);
         add(southPanel, BorderLayout.SOUTH);
 
@@ -142,6 +177,7 @@ public class GamePanel extends JPanel {
     private void setUpCenterPanelAndComponents() {
         centerPanel.setBackground(Color.BLACK);
         centerPanel.setPreferredSize(GraphicConstants.CENTER_PANEL_BOUNDS);
+        centerPanel.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
 
 
         add(centerPanel, BorderLayout.CENTER);
@@ -158,8 +194,44 @@ public class GamePanel extends JPanel {
         public SOSGameTile(int index) {
             this.index = index;
             setBackground(Color.BLACK);
-            setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.ORANGE));
+            setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
+        }
 
+        public int getIndex() {
+            return index;
+        }
+
+        @Override
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D graphics2D = getGraphicsForDrawingChoice(g);
+            if(index % 2 == 0) {
+                drawX(graphics2D);
+            }
+            else {
+                drawO(graphics2D);
+            }
+        }
+
+        private void drawX(Graphics2D g) {
+            int offset = (int)(getWidth() * 0.25);
+            g.drawLine(offset, offset, getWidth() - offset, getHeight() - offset);
+            g.drawLine(offset, getHeight() - offset, getWidth() - offset, offset);
+        }
+
+        private void drawO(Graphics2D g) {
+            int offset = (int)(getWidth() * 0.25);
+            int circleDiameter = getWidth() - 2 * offset;
+            g.drawOval((getWidth() - circleDiameter) / 2, (getHeight() - circleDiameter) / 2,
+                    circleDiameter, circleDiameter);
+        }
+
+        private Graphics2D getGraphicsForDrawingChoice(Graphics g) {
+            Graphics2D graphics2D = (Graphics2D)g;
+            graphics2D.setColor(Color.WHITE);
+            int strokeSize = (int)(GraphicConstants.STROKE_SIZE_RATIO * getWidth());
+            graphics2D.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            return graphics2D;
         }
     }
 

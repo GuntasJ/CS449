@@ -43,5 +43,6 @@ public class GraphicConstants {
     public static final int NEW_GAME_BUTTON_WIDTH = 155;
     public static final Dimension NEW_GAME_BUTTON_BOUNDS = new Dimension(NEW_GAME_BUTTON_WIDTH, NEW_GAME_BUTTON_HEIGHT);
 
+    public static final double STROKE_SIZE_RATIO = 8.0 / 61.0;
 
 }
