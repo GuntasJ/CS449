@@ -4,7 +4,7 @@ import javax.swing.JFrame;
 
 public class GameFrame extends JFrame {
 
-    private GamePanel panel;
+    private final GamePanel panel;
 
     public GameFrame() {
         panel = new GamePanel();

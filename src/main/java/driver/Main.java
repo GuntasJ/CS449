@@ -6,6 +6,7 @@ import com.formdev.flatlaf.intellijthemes.FlatDarkPurpleIJTheme;
 import com.formdev.flatlaf.intellijthemes.FlatMaterialDesignDarkIJTheme;
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMaterialDarkerContrastIJTheme;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import gamelogic.SOSGameLogic;
 import graphics.GameFrame;
 
 import javax.swing.SwingUtilities;
@@ -25,6 +26,9 @@ public class Main {
         UIManager.put("Button.arc", 0);
 
         SwingUtilities.invokeLater(() -> new GameFrame().setVisible(true));
+
+
+
     }
 
 }
