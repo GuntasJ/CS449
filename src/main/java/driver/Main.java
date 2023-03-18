@@ -18,17 +18,21 @@ public class Main {
 
     public static void main(String[] args) {
         if(System.getProperty("os.name").equals("Mac OS X")) {
-            System.setProperty("apple.awt.application.appearance", "system");
-            System.setProperty("apple.awt.application.name", "SOS Game");
+            macOSSetUp();
         }
-        FlatMaterialDarkerContrastIJTheme.setup();
 
-        UIManager.put("Button.arc", 0);
+        osAgnosticDecorations();
 
         SwingUtilities.invokeLater(() -> new GameFrame().setVisible(true));
+    }
 
-
-
+    private static void macOSSetUp() {
+        System.setProperty("apple.awt.application.appearance", "system");
+        System.setProperty("apple.awt.application.name", "SOS Game");
+    }
+    private static void osAgnosticDecorations() {
+        FlatMaterialDarkerContrastIJTheme.setup();
+        UIManager.put("Button.arc", 0);
     }
 
 }

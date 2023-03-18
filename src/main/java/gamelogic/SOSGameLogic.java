@@ -1,20 +1,20 @@
 package gamelogic;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public class SOSGameLogic {
 
-    private String currentChoice = "S";
+    private String currentChoiceBlue;
+    private String currentChoiceRed;
     private String[][] gameBoard;
-    private Player player;
+    private Player currentPlayer;
     private GameMode gameMode;
 
     private int size;
 
-    public SOSGameLogic(int size, Player startingPlayer, GameMode gameMode) {
+    public SOSGameLogic(int size, Player currentPlayerPlayer, GameMode gameMode) {
         this.size = size;
-        this.player = startingPlayer;
+        this.currentPlayer = currentPlayerPlayer;
         this.gameMode = gameMode;
         setSize(size);
         clearBoard();
@@ -22,7 +22,7 @@ public class SOSGameLogic {
 
     public SOSGameLogic(Player startingPlayer) {
         size = -1;
-        player = startingPlayer;
+        currentPlayer = startingPlayer;
         gameMode = null;
     }
 
@@ -44,7 +44,15 @@ public class SOSGameLogic {
     }
 
     public String getCurrentChoice() {
-        return currentChoice;
+        if(currentPlayer == Player.RED_PLAYER) {
+            return currentChoiceRed;
+        }
+        else if(currentPlayer == Player.BLUE_PLAYER) {
+            return currentChoiceBlue;
+        }
+        else {
+            return null;
+        }
     }
 
     public void makeMove(int x, int y) {
@@ -54,12 +62,20 @@ public class SOSGameLogic {
         if(!gameBoard[x][y].equals(" ")) {
             throw new IllegalArgumentException("Choice must be placed on empty square.");
         }
-        gameBoard[x][y] = String.valueOf(currentChoice);
+        gameBoard[x][y] = getCurrentChoice();
 
     }
     public void setCurrentChoice(String currentChoice) {
         if(currentChoice.equals("S") || currentChoice.equals("O")) {
-            this.currentChoice = currentChoice;
+            if(currentPlayer == Player.BLUE_PLAYER) {
+                currentChoiceBlue = currentChoice;
+            }
+            else if(currentPlayer == Player.RED_PLAYER) {
+                currentChoiceRed = currentChoice;
+            }
+            else {
+                throw new IllegalArgumentException("Invalid Player");
+            }
         }
         else {
             throw new IllegalArgumentException("Current choice must be S or O");
@@ -67,19 +83,23 @@ public class SOSGameLogic {
     }
 
     public void switchPlayer() {
-        if(player == Player.RED_PLAYER) {
-            player = Player.BLUE_PLAYER;
-        } else {
-            player = Player.RED_PLAYER;
+        if(currentPlayer == Player.RED_PLAYER) {
+            currentPlayer = Player.BLUE_PLAYER;
+        }
+        else if(currentPlayer == Player.BLUE_PLAYER){
+            currentPlayer = Player.RED_PLAYER;
+        }
+        else {
+            throw new IllegalArgumentException("Invalid Player");
         }
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
     }
 
-    public Player getPlayer() {
-        return player;
+    public Player getCurrentPlayer() {
+        return currentPlayer;
     }
 
     public void setGameMode(GameMode gameMode) {
@@ -95,19 +115,11 @@ public class SOSGameLogic {
     @Override
     public String toString() {
         return "SOSGameLogic{" +
-                "currentChoice='" + currentChoice + '\'' +
+                "currentChoice='" + getCurrentChoice() + '\'' +
                 ", gameBoard=" + Arrays.deepToString(gameBoard) +
                 ", size=" + size +
                 '}';
     }
 
-    public enum Player {
-        BLUE_PLAYER,
-        RED_PLAYER
-    }
 
-    public enum GameMode {
-        SIMPLE,
-        GENERAL
-    }
 }

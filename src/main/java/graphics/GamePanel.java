@@ -1,5 +1,7 @@
 package graphics;
 
+import gamelogic.GameMode;
+import gamelogic.Player;
 import gamelogic.SOSGameLogic;
 import gamelogic.SOSGameUtils;
 
@@ -12,14 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -34,7 +29,7 @@ public class GamePanel extends JPanel {
     private final JPanel centerPanel;
     private final JPanel southPanel;
 
-    private final ButtonGroup topButtons;
+    private final ButtonGroup gameTypeRadioButtonGroup;
     private final JRadioButton gameTypeSimpleRadioButton;
     private final JRadioButton gameTypeGeneralRadioButton;
 
@@ -45,7 +40,6 @@ public class GamePanel extends JPanel {
     private final ButtonGroup bluePlayerButtonGroup;
     private final JRadioButton bluePlayerSRadioButton;
     private final JRadioButton bluePlayerORadioButton;
-
 
     private final JLabel buttonGroupLabel;
     private final JLabel boardSizeLabel;
@@ -75,7 +69,7 @@ public class GamePanel extends JPanel {
         bluePlayerLabel = new JLabel("Blue Player");
         currentPlayerTurnLabel = new JLabel("Current Player: ");
 
-        topButtons = new ButtonGroup();
+        gameTypeRadioButtonGroup = new ButtonGroup();
         gameTypeGeneralRadioButton = new JRadioButton("General Game");
         gameTypeSimpleRadioButton = new JRadioButton("Simple Game");
 
@@ -91,11 +85,10 @@ public class GamePanel extends JPanel {
 
         newGameButton = new JButton("New Game");
 
-        gameLogic = new SOSGameLogic(SOSGameLogic.Player.RED_PLAYER);
+        gameLogic = new SOSGameLogic(Player.RED_PLAYER);
 
         makeSOSTiles = e -> {
             gameLogic.setSize(Integer.parseInt(boardSizeTextField.getText()));
-            System.out.println(gameLogic.getSize());
             gameLogic.clearBoard();
             centerPanel.removeAll();
             centerPanel.setLayout(new GridLayout(gameLogic.getSize(), gameLogic.getSize()));
@@ -103,12 +96,12 @@ public class GamePanel extends JPanel {
                 centerPanel.add(new SOSGameTile(i));
             }
 
-            currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getPlayer());
+            currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getCurrentPlayer());
 
             if(gameTypeSimpleRadioButton.isSelected()) {
-                gameLogic.setGameMode(SOSGameLogic.GameMode.SIMPLE);
+                gameLogic.setGameMode(GameMode.SIMPLE);
             } else if(gameTypeGeneralRadioButton.isSelected()) {
-                gameLogic.setGameMode(SOSGameLogic.GameMode.GENERAL);
+                gameLogic.setGameMode(GameMode.GENERAL);
             }
 
             centerPanel.revalidate();
@@ -138,8 +131,8 @@ public class GamePanel extends JPanel {
 
 
         //radio buttons
-        gameTypeSimpleRadioButton.addActionListener(e -> gameLogic.setGameMode(SOSGameLogic.GameMode.SIMPLE));
-        gameTypeGeneralRadioButton.addActionListener(e -> gameLogic.setGameMode(SOSGameLogic.GameMode.GENERAL));
+        gameTypeSimpleRadioButton.addActionListener(e -> gameLogic.setGameMode(GameMode.SIMPLE));
+        gameTypeGeneralRadioButton.addActionListener(e -> gameLogic.setGameMode(GameMode.GENERAL));
         gameTypeSimpleRadioButton.setPreferredSize(GraphicConstants.RADIO_BUTTON_GAME_TYPE_BOUNDS);
         gameTypeGeneralRadioButton.setPreferredSize(GraphicConstants.RADIO_BUTTON_GAME_TYPE_BOUNDS);
         gameTypeSimpleRadioButton.setFocusPainted(false);
@@ -156,8 +149,8 @@ public class GamePanel extends JPanel {
 
         northPanel.add(buttonGroupLabel);
 
-        topButtons.add(gameTypeSimpleRadioButton);
-        topButtons.add(gameTypeGeneralRadioButton);
+        gameTypeRadioButtonGroup.add(gameTypeSimpleRadioButton);
+        gameTypeRadioButtonGroup.add(gameTypeGeneralRadioButton);
         northPanel.add(gameTypeSimpleRadioButton);
         northPanel.add(gameTypeGeneralRadioButton);
 
@@ -267,11 +260,10 @@ public class GamePanel extends JPanel {
                 public void mouseReleased(MouseEvent e) {
                     int[] cords = SOSGameUtils.convertOneDIndexToTwoD(index, gameLogic.getSize());
                     selection = gameLogic.getCurrentChoice();
-                    System.out.println(Arrays.toString(cords));
                     gameLogic.makeMove(cords[0], cords[1]);
-                    currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getPlayer());
+                    currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getCurrentPlayer());
 
-                    if(gameLogic.getGameMode() == SOSGameLogic.GameMode.SIMPLE) {
+                    if(gameLogic.getGameMode() == GameMode.SIMPLE) {
                         gameLogic.switchPlayer();
                     }
 
@@ -285,10 +277,13 @@ public class GamePanel extends JPanel {
             return index;
         }
 
-        private void drawX(Graphics2D g) {
-            int offset = (int)(getWidth() * 0.25);
-            g.drawLine(offset, offset, getWidth() - offset, getHeight() - offset);
-            g.drawLine(offset, getHeight() - offset, getWidth() - offset, offset);
+        private void drawS(Graphics2D g) {
+            float fontSize = (float) (5 * (GraphicConstants.STROKE_SIZE_RATIO * getWidth()));
+            g.setFont(g.getFont().deriveFont(fontSize));
+            FontMetrics fm = g.getFontMetrics();
+            int x = (getWidth() - fm.stringWidth("S")) / 2;
+            int y = ((getHeight() - fm.getHeight()) / 2) + fm.getAscent();
+            g.drawString("S", x, y);
         }
 
         private void drawO(Graphics2D g) {
@@ -314,7 +309,7 @@ public class GamePanel extends JPanel {
                 return;
             }
             if(selection.equals("S")) {
-                drawX(graphics2D);
+                drawS(graphics2D);
             }
             else if(selection.equals("O")) {
                 drawO(graphics2D);
