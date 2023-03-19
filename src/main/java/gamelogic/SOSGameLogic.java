@@ -110,7 +110,13 @@ public class SOSGameLogic {
         return gameMode;
     }
 
+    public void setCurrentChoiceBlue(String currentChoiceBlue) {
+        this.currentChoiceBlue = currentChoiceBlue;
+    }
 
+    public void setCurrentChoiceRed(String currentChoiceRed) {
+        this.currentChoiceRed = currentChoiceRed;
+    }
 
     @Override
     public String toString() {

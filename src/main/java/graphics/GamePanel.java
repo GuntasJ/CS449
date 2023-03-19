@@ -14,12 +14,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
-
+import java.awt.*;
 
 public class GamePanel extends JPanel {
 
@@ -92,6 +90,21 @@ public class GamePanel extends JPanel {
             gameLogic.clearBoard();
             centerPanel.removeAll();
             centerPanel.setLayout(new GridLayout(gameLogic.getSize(), gameLogic.getSize()));
+
+            if(redPlayerSRadioButton.isSelected()) {
+                gameLogic.setCurrentChoiceRed("S");
+            }
+            else if(redPlayerORadioButton.isSelected()) {
+                gameLogic.setCurrentChoiceRed("O");
+            }
+
+            if(bluePlayerSRadioButton.isSelected()) {
+                gameLogic.setCurrentChoiceBlue("S");
+            }
+            else if(bluePlayerORadioButton.isSelected()) {
+                gameLogic.setCurrentChoiceBlue("O");
+            }
+
             for(int i = 0; i < Math.pow(gameLogic.getSize(), 2); i++) {
                 centerPanel.add(new SOSGameTile(i));
             }
@@ -261,11 +274,12 @@ public class GamePanel extends JPanel {
                     int[] cords = SOSGameUtils.convertOneDIndexToTwoD(index, gameLogic.getSize());
                     selection = gameLogic.getCurrentChoice();
                     gameLogic.makeMove(cords[0], cords[1]);
-                    currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getCurrentPlayer());
 
                     if(gameLogic.getGameMode() == GameMode.SIMPLE) {
                         gameLogic.switchPlayer();
                     }
+
+                    currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getCurrentPlayer());
 
                     repaint();
 
