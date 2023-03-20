@@ -192,8 +192,10 @@ public class GamePanel extends JPanel {
 
         eastPanel.add(Box.createRigidArea(new Dimension(0, 50)));
 
-        redPlayerORadioButton.addActionListener(e -> gameLogic.setCurrentChoice("O"));
-        redPlayerSRadioButton.addActionListener(e -> gameLogic.setCurrentChoice("S"));
+        redPlayerORadioButton.addActionListener(e ->
+                gameLogic.setCurrentChoice("O", Player.RED_PLAYER));
+        redPlayerSRadioButton.addActionListener(e ->
+                gameLogic.setCurrentChoice("S", Player.RED_PLAYER));
 
         redPlayerButtonGroup.add(redPlayerORadioButton);
         redPlayerButtonGroup.add(redPlayerSRadioButton);
@@ -217,8 +219,10 @@ public class GamePanel extends JPanel {
 
         westPanel.add(Box.createRigidArea(new Dimension(0, 50)));
 
-        bluePlayerORadioButton.addActionListener(e -> gameLogic.setCurrentChoice("O"));
-        bluePlayerSRadioButton.addActionListener(e -> gameLogic.setCurrentChoice("S"));
+        bluePlayerORadioButton.addActionListener(e ->
+                gameLogic.setCurrentChoice("O", Player.BLUE_PLAYER));
+        bluePlayerSRadioButton.addActionListener(e ->
+                gameLogic.setCurrentChoice("S", Player.BLUE_PLAYER));
 
         bluePlayerButtonGroup.add(bluePlayerORadioButton);
         bluePlayerButtonGroup.add(bluePlayerSRadioButton);
@@ -254,6 +258,22 @@ public class GamePanel extends JPanel {
 
         add(centerPanel, BorderLayout.CENTER);
     }
+
+    //Getters for test code
+
+
+    public JRadioButton getGameTypeSimpleRadioButton() {
+        return gameTypeSimpleRadioButton;
+    }
+
+    public JRadioButton getGameTypeGeneralRadioButton() {
+        return gameTypeGeneralRadioButton;
+    }
+
+    public JTextField getBoardSizeTextField() {
+        return boardSizeTextField;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -271,14 +291,19 @@ public class GamePanel extends JPanel {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseReleased(MouseEvent e) {
+                    currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getCurrentPlayer());
                     int[] cords = SOSGameUtils.convertOneDIndexToTwoD(index, gameLogic.getSize());
-                    selection = gameLogic.getCurrentChoice();
-                    gameLogic.makeMove(cords[0], cords[1]);
-
-                    if(gameLogic.getGameMode() == GameMode.SIMPLE) {
-                        gameLogic.switchPlayer();
+                    if(selection == null) {
+                        selection = gameLogic.getCurrentChoice();
                     }
 
+                    System.out.println(gameLogic.getCurrentPlayer() + " with choice: " + gameLogic.getCurrentChoice() );
+
+                    gameLogic.makeMove(cords[0], cords[1]);
+
+
+
+                    gameLogic.switchPlayer();
                     currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getCurrentPlayer());
 
                     repaint();

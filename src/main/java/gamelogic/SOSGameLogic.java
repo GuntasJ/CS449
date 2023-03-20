@@ -62,20 +62,32 @@ public class SOSGameLogic {
         if(!gameBoard[x][y].equals(" ")) {
             throw new IllegalArgumentException("Choice must be placed on empty square.");
         }
+        if(gameMode == null) {
+            throw new IllegalArgumentException("Game mode cannot be null.");
+        }
+        if(getCurrentChoice() == null) {
+            throw new IllegalArgumentException("Selection cannot be null.");
+        }
         gameBoard[x][y] = getCurrentChoice();
 
     }
-    public void setCurrentChoice(String currentChoice) {
+    public void setCurrentChoice(String currentChoice, Player playerThatChose) {
         if(currentChoice.equals("S") || currentChoice.equals("O")) {
-            if(currentPlayer == Player.BLUE_PLAYER) {
+            if(currentPlayer == Player.BLUE_PLAYER && currentPlayer == playerThatChose) {
                 currentChoiceBlue = currentChoice;
             }
-            else if(currentPlayer == Player.RED_PLAYER) {
+            else if(currentPlayer == Player.RED_PLAYER && currentPlayer == playerThatChose) {
                 currentChoiceRed = currentChoice;
             }
             else {
-                throw new IllegalArgumentException("Invalid Player");
+                if(playerThatChose == Player.RED_PLAYER) {
+                    currentChoiceRed = currentChoice;
+                }
+                else if(playerThatChose == Player.BLUE_PLAYER) {
+                    currentChoiceBlue = currentChoice;
+                }
             }
+
         }
         else {
             throw new IllegalArgumentException("Current choice must be S or O");
@@ -116,6 +128,10 @@ public class SOSGameLogic {
 
     public void setCurrentChoiceRed(String currentChoiceRed) {
         this.currentChoiceRed = currentChoiceRed;
+    }
+
+    public String[][] getGameBoard() {
+        return gameBoard;
     }
 
     @Override
