@@ -4,31 +4,106 @@ import java.util.Arrays;
 
 public class SOSGameLogic {
 
-    private String currentChoiceBlue;
-    private String currentChoiceRed;
-    private String[][] gameBoard;
+    private Player redPlayer;
+    private Player bluePlayer;
     private Player currentPlayer;
+    private Tile[][] gameBoard;
     private GameMode gameMode;
 
     private int size;
 
-    public SOSGameLogic(int size, Player currentPlayerPlayer, GameMode gameMode) {
+    private SOSGameLogic(int size, GameMode gameMode, PlayerTypeMode playerTypeMode, Player.PlayerColor currentPlayer) {
         this.size = size;
-        this.currentPlayer = currentPlayerPlayer;
         this.gameMode = gameMode;
+
+        determinePlayerConfiguration(playerTypeMode);
+
+        this.currentPlayer = currentPlayer == Player.PlayerColor.RED_PLAYER ? redPlayer : bluePlayer;
+
         setSize(size);
         clearBoard();
     }
 
-    public SOSGameLogic(Player startingPlayer) {
-        size = -1;
-        currentPlayer = startingPlayer;
-        gameMode = null;
+
+    //Builder
+
+    public static SOSGameLogicBuilder newBuilder() {
+        return new SOSGameLogicBuilder();
+    }
+    public static class SOSGameLogicBuilder {
+
+        private int size = 3;
+        private GameMode gameMode = GameMode.SIMPLE;
+        private PlayerTypeMode playerTypeMode = PlayerTypeMode.ALL_HUMAN;
+        private Player.PlayerColor currentPlayer = Player.PlayerColor.RED_PLAYER;
+
+        public SOSGameLogic build() {
+            return new SOSGameLogic(size, gameMode, playerTypeMode, currentPlayer);
+        }
+
+        public SOSGameLogicBuilder setSize(int size) {
+            this.size = size;
+            return this;
+        }
+
+        public SOSGameLogicBuilder setGameMode(GameMode gameMode) {
+            this.gameMode = gameMode;
+            return this;
+        }
+
+        public SOSGameLogicBuilder setPlayerTypeMode(PlayerTypeMode playerTypeMode) {
+            this.playerTypeMode = playerTypeMode;
+            return this;
+        }
+
+        public SOSGameLogicBuilder setCurrentPlayerColor(Player.PlayerColor currentPlayer) {
+            this.currentPlayer = currentPlayer;
+            return this;
+        }
+    }
+
+
+
+
+
+
+
+
+
+    public void determinePlayerConfiguration(PlayerTypeMode playerTypeMode) {
+        switch(playerTypeMode) {
+            case ALL_HUMAN -> {
+                redPlayer =
+                        new Player(Player.PlayerColor.RED_PLAYER, Player.PlayerType.HUMAN_PLAYER, "");
+                bluePlayer =
+                        new Player(Player.PlayerColor.BLUE_PLAYER, Player.PlayerType.HUMAN_PLAYER, "");
+            }
+            case ALL_COMPUTER -> {
+                redPlayer =
+                        new Player(Player.PlayerColor.RED_PLAYER, Player.PlayerType.COMPUTER_PLAYER, "");
+                bluePlayer =
+                        new Player(Player.PlayerColor.BLUE_PLAYER, Player.PlayerType.COMPUTER_PLAYER, "");
+            }
+            case RED_HUMAN_BLUE_COMPUTER -> {
+                redPlayer =
+                        new Player(Player.PlayerColor.RED_PLAYER, Player.PlayerType.HUMAN_PLAYER, "");
+                bluePlayer =
+                        new Player(Player.PlayerColor.BLUE_PLAYER, Player.PlayerType.COMPUTER_PLAYER, "");
+            }
+            case RED_COMPUTER_BLUE_HUMAN -> {
+                redPlayer =
+                        new Player(Player.PlayerColor.RED_PLAYER, Player.PlayerType.COMPUTER_PLAYER, "");
+                bluePlayer =
+                        new Player(Player.PlayerColor.BLUE_PLAYER, Player.PlayerType.HUMAN_PLAYER, "");
+            }
+        }
     }
 
     public void clearBoard() {
-        for(String[] row : gameBoard) {
-            Arrays.fill(row, " ");
+        for(int i = 0; i < size; i++) {
+            for(int j = 0; j < size; j++) {
+                gameBoard[i][j] = new Tile();
+            }
         }
     }
 
@@ -40,78 +115,40 @@ public class SOSGameLogic {
             throw new IllegalArgumentException("Size must be greater than 2.");
         }
         this.size = size;
-        gameBoard = new String[size][size];
+        gameBoard = new Tile[size][size];
     }
 
-    public String getCurrentChoice() {
-        if(currentPlayer == Player.RED_PLAYER) {
-            return currentChoiceRed;
-        }
-        else if(currentPlayer == Player.BLUE_PLAYER) {
-            return currentChoiceBlue;
-        }
-        else {
-            return null;
-        }
+    private void executeMove(Move move) {
+        gameBoard[move.x()][move.y()].setSelection(move.choice());
     }
 
     public void makeMove(int x, int y) {
         if(x < 0 || x > gameBoard.length || y < 0 || y > gameBoard[0].length) {
             throw new IllegalArgumentException("x and y must fall within game board.");
         }
-        if(!gameBoard[x][y].equals(" ")) {
+        if(!gameBoard[x][y].getSelection().equals(" ")) {
             throw new IllegalArgumentException("Choice must be placed on empty square.");
         }
         if(gameMode == null) {
             throw new IllegalArgumentException("Game mode cannot be null.");
         }
-        if(getCurrentChoice() == null) {
+        if(currentPlayer.getPlayerChoice() == null) {
             throw new IllegalArgumentException("Selection cannot be null.");
         }
-        gameBoard[x][y] = getCurrentChoice();
-
+        executeMove(currentPlayer.makeMove(x, y));
     }
-    public void setCurrentChoice(String currentChoice, Player playerThatChose) {
-        if(currentChoice.equals("S") || currentChoice.equals("O")) {
-            if(currentPlayer == Player.BLUE_PLAYER && currentPlayer == playerThatChose) {
-                currentChoiceBlue = currentChoice;
-            }
-            else if(currentPlayer == Player.RED_PLAYER && currentPlayer == playerThatChose) {
-                currentChoiceRed = currentChoice;
-            }
-            else {
-                if(playerThatChose == Player.RED_PLAYER) {
-                    currentChoiceRed = currentChoice;
-                }
-                else if(playerThatChose == Player.BLUE_PLAYER) {
-                    currentChoiceBlue = currentChoice;
-                }
-            }
 
-        }
-        else {
-            throw new IllegalArgumentException("Current choice must be S or O");
-        }
-    }
 
     public void switchPlayer() {
-        if(currentPlayer == Player.RED_PLAYER) {
-            currentPlayer = Player.BLUE_PLAYER;
+        if(currentPlayer == redPlayer) {
+            currentPlayer = bluePlayer;
         }
-        else if(currentPlayer == Player.BLUE_PLAYER){
-            currentPlayer = Player.RED_PLAYER;
+        else if(currentPlayer == bluePlayer) {
+            currentPlayer = redPlayer;
         }
         else {
             throw new IllegalArgumentException("Invalid Player");
         }
-    }
-
-    public void setCurrentPlayer(Player currentPlayer) {
-        this.currentPlayer = currentPlayer;
-    }
-
-    public Player getCurrentPlayer() {
-        return currentPlayer;
     }
 
     public void setGameMode(GameMode gameMode) {
@@ -122,26 +159,39 @@ public class SOSGameLogic {
         return gameMode;
     }
 
-    public void setCurrentChoiceBlue(String currentChoiceBlue) {
-        this.currentChoiceBlue = currentChoiceBlue;
-    }
 
-    public void setCurrentChoiceRed(String currentChoiceRed) {
-        this.currentChoiceRed = currentChoiceRed;
-    }
-
-    public String[][] getGameBoard() {
+    public Tile[][] getGameBoard() {
         return gameBoard;
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public Player getRedPlayer() {
+        return redPlayer;
+    }
+
+    public Player getBluePlayer() {
+        return bluePlayer;
+    }
+
+    public enum PlayerTypeMode {
+        ALL_HUMAN,
+        ALL_COMPUTER,
+        RED_HUMAN_BLUE_COMPUTER,
+        RED_COMPUTER_BLUE_HUMAN
     }
 
     @Override
     public String toString() {
         return "SOSGameLogic{" +
-                "currentChoice='" + getCurrentChoice() + '\'' +
-                ", gameBoard=" + Arrays.deepToString(gameBoard) +
+                "redPlayer=" + redPlayer +
+                ", bluePlayer=" + bluePlayer +
+                ", currentPlayer=" + currentPlayer +
+                ", gameBoard=" + Arrays.toString(gameBoard) +
+                ", gameMode=" + gameMode +
                 ", size=" + size +
                 '}';
     }
-
-
 }

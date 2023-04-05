@@ -3,13 +3,13 @@ package tests;
 import gamelogic.GameMode;
 import gamelogic.Player;
 import gamelogic.SOSGameLogic;
+import gamelogic.Tile;
 import graphics.GameFrame;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.*;
-import java.awt.event.ActionListener;
 
 public class StartGameTest {
 
@@ -19,7 +19,7 @@ public class StartGameTest {
 
     @Before
     public void setUp() throws AWTException {
-        gameLogic = new SOSGameLogic(Player.RED_PLAYER);
+        gameLogic = SOSGameLogic.newBuilder().build();
         gameFrame = new GameFrame();
         robot = new Robot();
     }
@@ -31,9 +31,9 @@ public class StartGameTest {
         gameLogic.setGameMode(GameMode.SIMPLE);
         gameLogic.clearBoard();
 
-        for(String[] row : gameLogic.getGameBoard()) {
-            for(String value : row) {
-                Assert.assertEquals(" ", value);
+        for(Tile[] row : gameLogic.getGameBoard()) {
+            for(Tile value : row) {
+                Assert.assertEquals(" ", value.getSelection());
             }
         }
     }
@@ -42,7 +42,8 @@ public class StartGameTest {
     public void testInvalidNewGameNoGameMode() {
         gameLogic.setSize(5);
         gameLogic.clearBoard();
-        gameLogic.setCurrentChoiceRed("S");
+        gameLogic.getRedPlayer().setPlayerChoice("S");
+        gameLogic.setGameMode(null);
         try {
             gameLogic.makeMove(1, 1);
         } catch (IllegalArgumentException e) {

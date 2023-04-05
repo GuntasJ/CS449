@@ -19,7 +19,7 @@ public class BoardSizeTest {
 
     @Before
     public void setUp() throws AWTException {
-        gameLogic = new SOSGameLogic(Player.RED_PLAYER);
+        gameLogic = SOSGameLogic.newBuilder().build();
         gameFrame = new GameFrame();
         robot = new Robot();
     }

@@ -13,23 +13,28 @@ public class MakeMoveSimpleGameTest {
 
     @Before
     public void setUp() {
-        gameLogic = new SOSGameLogic(3, Player.RED_PLAYER, GameMode.SIMPLE);
+        gameLogic = SOSGameLogic.newBuilder()
+                .setSize(3)
+                .setGameMode(GameMode.SIMPLE)
+                .setPlayerTypeMode(SOSGameLogic.PlayerTypeMode.ALL_HUMAN)
+                .setCurrentPlayerColor(Player.PlayerColor.RED_PLAYER)
+                .build();
     }
 
     //AC 4.1
     @Test
     public void testSuccessfulMoveInSimpleGame() {
         String selection = "S";
-        gameLogic.setCurrentChoice(selection, Player.RED_PLAYER);
+        gameLogic.getCurrentPlayer().setPlayerChoice(selection);
         gameLogic.makeMove(1, 1);
-        Assert.assertEquals("S", gameLogic.getGameBoard()[1][1]);
+        Assert.assertEquals("S", gameLogic.getGameBoard()[1][1].getSelection());
     }
 
     //AC 4.2
     @Test
     public void testInvalidMoveOnNonEmptyTileInSimpleGame() {
         String selection = "S";
-        gameLogic.setCurrentChoice(selection, Player.RED_PLAYER);
+        gameLogic.getCurrentPlayer().setPlayerChoice(selection);
         gameLogic.makeMove(1, 1);
         try {
             gameLogic.makeMove(1, 1);
@@ -52,7 +57,7 @@ public class MakeMoveSimpleGameTest {
     public void testInvalidMoveWithNoSelectionOnNonEmptyTileInSimpleGame() {
         testSuccessfulMoveInSimpleGame();
         try {
-            gameLogic.setCurrentChoice(" ", Player.BLUE_PLAYER);
+            gameLogic.getCurrentPlayer().setPlayerChoice(" ");
             gameLogic.makeMove(1, 1);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Current choice must be S or O", e.getMessage());
