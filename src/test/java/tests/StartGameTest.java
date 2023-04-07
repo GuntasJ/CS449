@@ -1,7 +1,6 @@
 package tests;
 
 import gamelogic.GameMode;
-import gamelogic.Player;
 import gamelogic.SOSGameLogic;
 import gamelogic.Tile;
 import graphics.GameFrame;

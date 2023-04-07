@@ -1,14 +1,12 @@
 package gamelogic;
 
-import java.util.Arrays;
-
 public class SOSGameUtils {
 
     private static int combinationCount = 0;
 
-    public static int convertTwoDIndexToOneD(int x, int y, int arraySize) {
-        return x * arraySize + y;
-    }
+//    public static int convertTwoDIndexToOneD(int x, int y, int arraySize) {
+//        return x * arraySize + y;
+//    }
     public static int[] convertOneDIndexToTwoD(int index, int arraySize) {
         return new int[] {index / arraySize, index % arraySize};
     }
@@ -25,6 +23,8 @@ public class SOSGameUtils {
     public static void checkForAndMarkCombination(Tile[][] gameBoard, Player player) {
         checkAndMarkThreeInRow(gameBoard, player);
         checkAndMarkThreeInCol(gameBoard, player);
+        checkAndMarkThreeInPositiveDiagonal(gameBoard, player);
+        checkAndMarkThreeInNegativeDiagonal(gameBoard, player);
     }
 
     private static void checkAndMarkThreeInRow(Tile[][] gameBoard, Player player) {
@@ -45,6 +45,71 @@ public class SOSGameUtils {
                             Direction.VERTICAL, player);
                 }
             }
+        }
+    }
+
+    private static void checkAndMarkThreeInNegativeDiagonal(Tile[][] gameBoard, Player player) {
+        for(int i = 2; i < gameBoard.length; i++) {
+            checkAndMarkSingleFirstHalfNegativeDiagonal(i, gameBoard, player);
+        }
+        for(int i = 2; i < gameBoard.length; i++) {
+            checkAndMarkSingleSecondHalfNegativeDiagonal(i, gameBoard, player);
+        }
+    }
+    private static void checkAndMarkSingleFirstHalfNegativeDiagonal(int startingRow, Tile[][] gameBoard, Player player) {
+        int col = gameBoard.length - 1;
+        loopThroughNegativeDiagonal(startingRow, gameBoard, player, startingRow, col);
+    }
+    private static void checkAndMarkSingleSecondHalfNegativeDiagonal(int startingCol, Tile[][] gameBoard, Player player) {
+        int row = gameBoard.length - 1;
+        loopThroughNegativeDiagonal(startingCol, gameBoard, player, row, startingCol);
+    }
+
+    private static void loopThroughNegativeDiagonal(int startingCol, Tile[][] gameBoard, Player player, int row, int col) {
+        int limit = startingCol - 1;
+
+        for(int i = 0; i < limit; i++) {
+            if(isNewSOSCombination(gameBoard[row][col], gameBoard[row - 1][col - 1], gameBoard[row - 2][col - 2])) {
+                markTiles(gameBoard[row][col], gameBoard[row - 1][col - 1], gameBoard[row - 2][col - 2],
+                        Direction.NEGATIVE_DIAGONAL, player);
+            }
+            row--;
+            col--;
+        }
+    }
+
+    private static void checkAndMarkThreeInPositiveDiagonal(Tile[][] gameBoard, Player player) {
+        for(int i = 2; i < gameBoard.length; i++) {
+            checkAndMarkSingleFirstHalfPositiveDiagonal(i, gameBoard, player);
+        }
+        for(int i = gameBoard.length - 3; i >= 0; i--) {
+            checkAndMarkSingleSecondHalfPositiveDiagonal(i, gameBoard, player);
+        }
+    }
+
+    private static void checkAndMarkSingleFirstHalfPositiveDiagonal(int startingRow, Tile[][] gameBoard, Player player) {
+        int col = 0;
+        int limit = startingRow - 1;
+
+        loopThroughPositiveDiagonal(gameBoard, player, col, startingRow, limit);
+    }
+    private static void checkAndMarkSingleSecondHalfPositiveDiagonal(int startingCol, Tile[][] gameBoard, Player player) {
+        int row = gameBoard.length - 1;
+        int limit = gameBoard.length - startingCol - 2;
+
+        loopThroughPositiveDiagonal(gameBoard, player, startingCol, row, limit);
+
+    }
+
+    private static void loopThroughPositiveDiagonal(Tile[][] gameBoard, Player player, int col, int row, int limit) {
+        for(int i = 0; i < limit; i++) {
+            if(isNewSOSCombination(gameBoard[row][col], gameBoard[row - 1][col + 1],
+                    gameBoard[row - 2][col + 2])) {
+                markTiles(gameBoard[row][col], gameBoard[row - 1][col + 1], gameBoard[row - 2][col + 2],
+                        Direction.POSITIVE_DIAGONAL, player);
+            }
+            row--;
+            col++;
         }
     }
 

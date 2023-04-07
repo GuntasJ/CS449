@@ -1,6 +1,5 @@
 package tests;
 
-import gamelogic.Player;
 import gamelogic.SOSGameLogic;
 import graphics.GameFrame;
 import org.junit.Assert;

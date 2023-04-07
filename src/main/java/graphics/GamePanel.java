@@ -301,9 +301,6 @@ public class GamePanel extends JPanel {
             });
         }
 
-        public int getIndex() {
-            return index;
-        }
 
         private Color convertPlayerToGraphicsColor(Player player) {
             if(player.getPlayerColor() == Player.PlayerColor.RED_PLAYER) {
@@ -324,6 +321,12 @@ public class GamePanel extends JPanel {
                 }
                 if (combination.getCombinationDirection() == Direction.HORIZONTAL) {
                     graphics2D.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
+                }
+                if (combination.getCombinationDirection() == Direction.POSITIVE_DIAGONAL) {
+                    graphics2D.drawLine(0, getHeight(), getWidth(), 0);
+                }
+                if (combination.getCombinationDirection() == Direction.NEGATIVE_DIAGONAL) {
+                    graphics2D.drawLine(0, 0, getWidth(), getHeight());
                 }
             }
         }
