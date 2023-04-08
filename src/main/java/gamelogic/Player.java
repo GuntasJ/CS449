@@ -5,11 +5,13 @@ public class Player {
     private final PlayerColor playerColor;
     private final PlayerType playerType;
     private String playerChoice;
+    private int totalSOSCombinations;
 
     public Player(PlayerColor playerColor, PlayerType playerType, String playerChoice) {
         this.playerColor = playerColor;
         this.playerType = playerType;
         this.playerChoice = playerChoice;
+        totalSOSCombinations = 0;
     }
 
     public Move makeMove(int x, int y) {
@@ -33,6 +35,14 @@ public class Player {
 
     public PlayerColor getPlayerColor() {
         return playerColor;
+    }
+
+    public int getTotalSOSCombinations() {
+        return totalSOSCombinations;
+    }
+
+    public void incrementTotalSOSCombinations() {
+        totalSOSCombinations++;
     }
 
     @Override

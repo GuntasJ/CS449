@@ -2,15 +2,7 @@ package graphics;
 
 import gamelogic.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -49,7 +41,6 @@ public class GamePanel extends JPanel {
     private final ActionListener makeSOSTiles;
 
     private SOSGameLogic gameLogic;
-
 
     GamePanel() {
         northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 13));
@@ -143,8 +134,6 @@ public class GamePanel extends JPanel {
 
 
         //adding them
-
-
         northPanel.add(buttonGroupLabel);
 
         gameTypeRadioButtonGroup.add(gameTypeSimpleRadioButton);
@@ -165,17 +154,7 @@ public class GamePanel extends JPanel {
     }
 
     private void setUpEastPanelAndComponents() {
-        eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.Y_AXIS));
-        eastPanel.setPreferredSize(new Dimension(150, 200));
-
-        redPlayerLabel.setAlignmentX(CENTER_ALIGNMENT);
-        redPlayerLabel.setFont(redPlayerLabel.getFont().deriveFont(20f));
-
-        eastPanel.add(Box.createRigidArea(new Dimension(0, 50)));
-
-        eastPanel.add(redPlayerLabel);
-
-        eastPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+        helpSetUpEastWestLabelAndPanel(eastPanel, redPlayerLabel);
 
         redPlayerORadioButton.addActionListener(e ->  {
             if(gameLogic != null) gameLogic.getRedPlayer().setPlayerChoice("O");
@@ -193,18 +172,23 @@ public class GamePanel extends JPanel {
 
         add(eastPanel, BorderLayout.EAST);
     }
+
+    private void helpSetUpEastWestLabelAndPanel(JPanel eastPanel, JLabel redPlayerLabel) {
+        eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.Y_AXIS));
+        eastPanel.setPreferredSize(new Dimension(150, 200));
+
+        redPlayerLabel.setAlignmentX(CENTER_ALIGNMENT);
+        redPlayerLabel.setFont(redPlayerLabel.getFont().deriveFont(20f));
+
+        eastPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+
+        eastPanel.add(redPlayerLabel);
+
+        eastPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+    }
+
     private void setUpWestPanelAndComponents() {
-        westPanel.setLayout(new BoxLayout(westPanel, BoxLayout.Y_AXIS));
-        westPanel.setPreferredSize(new Dimension(150, 200));
-
-        bluePlayerLabel.setAlignmentX(CENTER_ALIGNMENT);
-        bluePlayerLabel.setFont(bluePlayerLabel.getFont().deriveFont(20f));
-
-        westPanel.add(Box.createRigidArea(new Dimension(0, 50)));
-
-        westPanel.add(bluePlayerLabel);
-
-        westPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+        helpSetUpEastWestLabelAndPanel(westPanel, bluePlayerLabel);
 
         bluePlayerORadioButton.addActionListener(e -> {
             if(gameLogic != null) gameLogic.getBluePlayer().setPlayerChoice("O");
@@ -263,6 +247,11 @@ public class GamePanel extends JPanel {
         return boardSizeTextField;
     }
 
+    private void disposeFrame() {
+        GameFrame gameFrame = (GameFrame) SwingUtilities.getWindowAncestor(this);
+        gameFrame.dispose();
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -270,11 +259,9 @@ public class GamePanel extends JPanel {
 
     private class SOSGameTile extends JPanel {
 
-        private final int index;
         private final Tile tile;
 
         public SOSGameTile(int index, Tile tile) {
-            this.index = index;
             this.tile = tile;
             setBackground(Color.BLACK);
             setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
@@ -284,17 +271,17 @@ public class GamePanel extends JPanel {
                     currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getCurrentPlayer());
                     int[] cords = SOSGameUtils.convertOneDIndexToTwoD(index, gameLogic.getSize());
 
-                    System.out.println(gameLogic.getCurrentPlayer()
-                            + " with choice: " + gameLogic.getCurrentPlayer().getPlayerChoice());
-
                     gameLogic.makeMove(cords[0], cords[1]);
 
-                    SOSGameUtils.checkForAndMarkCombination(gameLogic.getGameBoard(), gameLogic.getCurrentPlayer());
-                    SOSGameUtils.printBoard(gameLogic.getGameBoard());
+                    if(gameLogic.getGameState() != SOSGameLogic.GameState.GAME_NOT_OVER) {
+                        System.out.println(gameLogic.getGameState());
+                        SwingUtilities.invokeLater(
+                                () -> new MenuFrame(gameLogic.getGameState()).setVisible(true)
+                        );
+                        disposeFrame();
+                    }
 
-                    gameLogic.switchPlayer();
                     currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getCurrentPlayer());
-
                     repaint();
                     getParent().repaint();
                 }
@@ -314,18 +301,18 @@ public class GamePanel extends JPanel {
             graphics2D.setStroke(new BasicStroke(2));
 
             for(SOSCombination combination : tile.getCombinations()) {
-                graphics2D.setColor(convertPlayerToGraphicsColor(combination.getPlayerOfCombination()));
+                graphics2D.setColor(convertPlayerToGraphicsColor(combination.playerOfCombination()));
 
-                if (combination.getCombinationDirection() == Direction.VERTICAL) {
+                if (combination.combinationDirection() == Direction.VERTICAL) {
                     graphics2D.drawLine(getWidth() / 2, 0, getWidth() / 2, getHeight());
                 }
-                if (combination.getCombinationDirection() == Direction.HORIZONTAL) {
+                if (combination.combinationDirection() == Direction.HORIZONTAL) {
                     graphics2D.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
                 }
-                if (combination.getCombinationDirection() == Direction.POSITIVE_DIAGONAL) {
+                if (combination.combinationDirection() == Direction.POSITIVE_DIAGONAL) {
                     graphics2D.drawLine(0, getHeight(), getWidth(), 0);
                 }
-                if (combination.getCombinationDirection() == Direction.NEGATIVE_DIAGONAL) {
+                if (combination.combinationDirection() == Direction.NEGATIVE_DIAGONAL) {
                     graphics2D.drawLine(0, 0, getWidth(), getHeight());
                 }
             }

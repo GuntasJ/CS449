@@ -26,8 +26,8 @@ public class Tile {
         this.selection = selection;
     }
 
-    public void addSOSCombination(Player player, Direction direction, int id) {
-        combinations.add(new SOSCombination(player, direction, id));
+    public void addSOSCombination(Player player, Direction direction) {
+        combinations.add(new SOSCombination(player, direction));
     }
 
     public List<SOSCombination> getCombinations() {

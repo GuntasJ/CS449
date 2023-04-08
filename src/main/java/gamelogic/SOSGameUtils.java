@@ -2,11 +2,6 @@ package gamelogic;
 
 public class SOSGameUtils {
 
-    private static int combinationCount = 0;
-
-//    public static int convertTwoDIndexToOneD(int x, int y, int arraySize) {
-//        return x * arraySize + y;
-//    }
     public static int[] convertOneDIndexToTwoD(int index, int arraySize) {
         return new int[] {index / arraySize, index % arraySize};
     }
@@ -18,7 +13,6 @@ public class SOSGameUtils {
     15, 16, 17, 18, 19,
     20, 21, 22, 23, 24
      */
-
 
     public static void checkForAndMarkCombination(Tile[][] gameBoard, Player player) {
         checkAndMarkThreeInRow(gameBoard, player);
@@ -126,44 +120,34 @@ public class SOSGameUtils {
     private static void markTiles(Tile t1, Tile t2, Tile t3, Direction direction, Player player) {
         switch (direction) {
             case VERTICAL -> {
-                t1.addSOSCombination(player, direction, combinationCount);
-                t2.addSOSCombination(player, direction, combinationCount);
-                t3.addSOSCombination(player, direction, combinationCount);
+                t1.addSOSCombination(player, direction);
+                t2.addSOSCombination(player, direction);
+                t3.addSOSCombination(player, direction);
 
                 System.out.println("New SOS combo formed: Vertical");
             }
             case HORIZONTAL -> {
-                t1.addSOSCombination(player, direction, combinationCount);
-                t2.addSOSCombination(player, direction, combinationCount);
-                t3.addSOSCombination(player, direction, combinationCount);
+                t1.addSOSCombination(player, direction);
+                t2.addSOSCombination(player, direction);
+                t3.addSOSCombination(player, direction);
 
                 System.out.println("New SOS combo formed: Horizontal");
             }
             case POSITIVE_DIAGONAL -> {
-                t1.addSOSCombination(player, direction,combinationCount);
-                t2.addSOSCombination(player, direction,combinationCount);
-                t3.addSOSCombination(player, direction,combinationCount);
+                t1.addSOSCombination(player, direction);
+                t2.addSOSCombination(player, direction);
+                t3.addSOSCombination(player, direction);
 
                 System.out.println("New SOS combo formed: Positive Diagonal");
             }
             case NEGATIVE_DIAGONAL -> {
-                t1.addSOSCombination(player, direction,combinationCount);
-                t2.addSOSCombination(player, direction,combinationCount);
-                t3.addSOSCombination(player, direction,combinationCount);
+                t1.addSOSCombination(player, direction);
+                t2.addSOSCombination(player, direction);
+                t3.addSOSCombination(player, direction);
 
                 System.out.println("New SOS combo formed: Negative Diagonal");
             }
         }
-        combinationCount++;
+        player.incrementTotalSOSCombinations();
     }
-
-    public static void printBoard(Tile[][] gameBoard) {
-        for(Tile[] row : gameBoard) {
-            for(Tile tile : row) {
-                System.out.print(tile);
-            }
-            System.out.println();
-        }
-    }
-
 }
