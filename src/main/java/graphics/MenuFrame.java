@@ -1,6 +1,5 @@
 package graphics;
 
-import gamelogic.Player;
 import gamelogic.SOSGameLogic;
 
 import javax.swing.*;

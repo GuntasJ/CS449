@@ -63,4 +63,17 @@ public class MakeMoveSimpleGameTest {
             Assert.assertEquals("Current choice must be S or O", e.getMessage());
         }
     }
+
+    @Test
+    public void testGameEndsAfterAnSOSCombinationAndPlayerWithCombinationWins() {
+        gameLogic.getRedPlayer().setPlayerChoice("S");
+        gameLogic.getBluePlayer().setPlayerChoice("O");
+
+        gameLogic.makeMove(0,0);
+        gameLogic.makeMove(0, 1);
+        gameLogic.makeMove(0, 2);
+
+        Assert.assertNotSame(SOSGameLogic.GameState.GAME_NOT_OVER, gameLogic.getGameState());
+        Assert.assertEquals(SOSGameLogic.GameState.RED_WON, gameLogic.getGameState());
+    }
 }

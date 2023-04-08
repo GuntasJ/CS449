@@ -64,4 +64,30 @@ public class MakeMoveGeneralGameTest {
         }
     }
 
+    @Test
+    public void testShouldBeRedPlayerTurnAfterMakingSOSCombination() {
+        gameLogic.getRedPlayer().setPlayerChoice("S");
+        gameLogic.getBluePlayer().setPlayerChoice("O");
+
+        gameLogic.makeMove(0, 0);
+        gameLogic.makeMove(1, 1);
+        gameLogic.makeMove(2, 2);
+
+        Assert.assertEquals(gameLogic.getRedPlayer(), gameLogic.getCurrentPlayer());
+    }
+
+    @Test
+    public void testGameShouldEndWhenAllSquaresAreFilledWithRedPlayerWinningWithMoreCombinations() {
+        gameLogic.getRedPlayer().setPlayerChoice("S");
+        gameLogic.getBluePlayer().setPlayerChoice("O");
+
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                gameLogic.makeMove(i, j);
+            }
+        }
+        Assert.assertNotSame(gameLogic.getGameState(), SOSGameLogic.GameState.GAME_NOT_OVER);
+        Assert.assertEquals(SOSGameLogic.GameState.RED_WON, gameLogic.getGameState());
+    }
+
 }

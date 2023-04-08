@@ -2,18 +2,18 @@ package gamelogic;
 
 import java.util.Arrays;
 
-public class SOSGameLogic {
+public abstract class SOSGameLogic {
 
-    private Player redPlayer;
-    private Player bluePlayer;
-    private Player currentPlayer;
-    private Tile[][] gameBoard;
-    private GameMode gameMode;
-    private GameState gameState;
+    protected Player redPlayer;
+    protected Player bluePlayer;
+    protected Player currentPlayer;
+    protected Tile[][] gameBoard;
+    protected GameMode gameMode;
+    protected GameState gameState;
 
     private int size;
 
-    private SOSGameLogic(int size, GameMode gameMode, PlayerTypeMode playerTypeMode, Player.PlayerColor currentPlayer) {
+    protected SOSGameLogic(int size, GameMode gameMode, PlayerTypeMode playerTypeMode, Player.PlayerColor currentPlayer) {
         this.size = size;
         this.gameMode = gameMode;
         this.gameState = GameState.GAME_NOT_OVER;
@@ -40,7 +40,10 @@ public class SOSGameLogic {
         private Player.PlayerColor currentPlayer = Player.PlayerColor.RED_PLAYER;
 
         public SOSGameLogic build() {
-            return new SOSGameLogic(size, gameMode, playerTypeMode, currentPlayer);
+            if(gameMode == GameMode.SIMPLE) {
+                return new SimpleSOSGameLogic(size, playerTypeMode, currentPlayer);
+            }
+            return new GeneralSOSGameLogic(size, playerTypeMode, currentPlayer);
         }
 
         public SOSGameLogicBuilder setSize(int size) {
@@ -64,53 +67,7 @@ public class SOSGameLogic {
         }
     }
 
-    public GameState checkForWinner() {
-        if(gameMode == GameMode.SIMPLE) {
-            return checkForWinnerSimpleGame();
-        }
-        return checkForWinnerGeneralGame();
-    }
-
-    private GameState checkForWinnerSimpleGame() {
-        for (Tile[] tiles : gameBoard) {
-            for (int j = 0; j < gameBoard[0].length; j++) {
-                if (!tiles[j].getCombinations().isEmpty()) {
-                    if (tiles[j].getCombinations().get(0).playerOfCombination() == redPlayer) {
-                        return GameState.RED_WON;
-                    }
-                    return GameState.BLUE_WON;
-                }
-            }
-        }
-        for(Tile[] tiles : gameBoard) {
-            for(int j = 0; j < gameBoard[0].length; j++) {
-                if (tiles[j].getCombinations().isEmpty() && !tiles[j].getSelection().equals(" ")) {
-                    continue;
-                }
-                return GameState.GAME_NOT_OVER;
-            }
-        }
-        return GameState.TIE;
-
-    }
-    private GameState checkForWinnerGeneralGame() {
-        for(Tile[] tiles : gameBoard) {
-            for(int j = 0; j < gameBoard[0].length; j++) {
-                if(tiles[j].getSelection().equals(" ")) {
-                    return GameState.GAME_NOT_OVER;
-                }
-            }
-        }
-        if(redPlayer.getTotalSOSCombinations() > bluePlayer.getTotalSOSCombinations()) {
-            return GameState.RED_WON;
-        }
-        else if(bluePlayer.getTotalSOSCombinations() > redPlayer.getTotalSOSCombinations()) {
-            return GameState.BLUE_WON;
-        }
-        return GameState.TIE;
-    }
-
-
+    public abstract GameState checkForWinner();
 
     public void determinePlayerConfiguration(PlayerTypeMode playerTypeMode) {
         switch(playerTypeMode) {
@@ -160,15 +117,17 @@ public class SOSGameLogic {
         gameBoard = new Tile[size][size];
     }
 
-    private void executeMove(Move move) {
+    protected void executeMove(Move move) {
         gameBoard[move.x()][move.y()].setSelection(move.choice());
     }
 
-    public void makeMove(int x, int y) {
-        if (x < 0 || x > gameBoard.length || y < 0 || y > gameBoard[0].length) {
+    public abstract void makeMove(int row, int col);
+
+    protected void checkForValidMove(int row, int col) {
+        if (row < 0 || row > gameBoard.length || col < 0 || col > gameBoard[0].length) {
             throw new IllegalArgumentException("x and y must fall within game board.");
         }
-        if (!gameBoard[x][y].getSelection().equals(" ")) {
+        if (!gameBoard[row][col].getSelection().equals(" ")) {
             throw new IllegalArgumentException("Choice must be placed on empty square.");
         }
         if (gameMode == null) {
@@ -176,15 +135,6 @@ public class SOSGameLogic {
         }
         if (currentPlayer.getPlayerChoice() == null) {
             throw new IllegalArgumentException("Selection cannot be null.");
-        }
-
-        int previousCombinationNumber = currentPlayer.getTotalSOSCombinations();
-
-        executeMove(currentPlayer.makeMove(x, y));
-        SOSGameUtils.checkForAndMarkCombination(gameBoard, currentPlayer);
-        gameState = checkForWinner();
-        if(gameMode == GameMode.SIMPLE || currentPlayer.getTotalSOSCombinations() == previousCombinationNumber) {
-            switchPlayer();
         }
     }
 
