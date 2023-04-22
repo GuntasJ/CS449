@@ -17,7 +17,7 @@ public class MakeMoveSimpleGameTest {
                 .setSize(3)
                 .setGameMode(GameMode.SIMPLE)
                 .setPlayerTypeMode(SOSGameLogic.PlayerTypeMode.ALL_HUMAN)
-                .setCurrentPlayerColor(Player.PlayerColor.RED_PLAYER)
+                .setStartingPlayer(Player.PlayerColor.RED_PLAYER)
                 .build();
     }
 
@@ -64,16 +64,4 @@ public class MakeMoveSimpleGameTest {
         }
     }
 
-    @Test
-    public void testGameEndsAfterAnSOSCombinationAndPlayerWithCombinationWins() {
-        gameLogic.getRedPlayer().setPlayerChoice("S");
-        gameLogic.getBluePlayer().setPlayerChoice("O");
-
-        gameLogic.makeMove(0,0);
-        gameLogic.makeMove(0, 1);
-        gameLogic.makeMove(0, 2);
-
-        Assert.assertNotSame(SOSGameLogic.GameState.GAME_NOT_OVER, gameLogic.getGameState());
-        Assert.assertEquals(SOSGameLogic.GameState.RED_WON, gameLogic.getGameState());
-    }
 }

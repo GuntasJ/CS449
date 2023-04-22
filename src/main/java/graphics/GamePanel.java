@@ -76,7 +76,7 @@ public class GamePanel extends JPanel {
                     .setSize(Integer.parseInt(boardSizeTextField.getText()))
                     .setGameMode(gameTypeSimpleRadioButton.isSelected() ? GameMode.SIMPLE : GameMode.GENERAL)
                     .setPlayerTypeMode(SOSGameLogic.PlayerTypeMode.ALL_HUMAN)
-                    .setCurrentPlayerColor(Player.PlayerColor.RED_PLAYER)
+                    .setStartingPlayer(Player.PlayerColor.RED_PLAYER)
                     .build();
 
             gameLogic.getRedPlayer().setPlayerChoice(redPlayerSRadioButton.isSelected() ? "S" : "O");

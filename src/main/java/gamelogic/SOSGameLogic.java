@@ -61,7 +61,7 @@ public abstract class SOSGameLogic {
             return this;
         }
 
-        public SOSGameLogicBuilder setCurrentPlayerColor(Player.PlayerColor currentPlayer) {
+        public SOSGameLogicBuilder setStartingPlayer(Player.PlayerColor currentPlayer) {
             this.currentPlayer = currentPlayer;
             return this;
         }

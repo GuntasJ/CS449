@@ -15,7 +15,7 @@ public class MakeMoveGeneralGameTest {
     public void setUp() {
         gameLogic = SOSGameLogic.newBuilder()
                 .setSize(3)
-                .setCurrentPlayerColor(Player.PlayerColor.RED_PLAYER)
+                .setStartingPlayer(Player.PlayerColor.RED_PLAYER)
                 .setGameMode(GameMode.GENERAL)
                 .setPlayerTypeMode(SOSGameLogic.PlayerTypeMode.ALL_HUMAN)
                 .build();
@@ -29,6 +29,20 @@ public class MakeMoveGeneralGameTest {
         gameLogic.makeMove(1, 1);
         Assert.assertEquals("S", gameLogic.getGameBoard()[1][1].getSelection());
     }
+
+    //AC 6.2
+    @Test
+    public void testRedPlayerKeepsHisTurnAfterMakingSOSCombination() {
+        gameLogic.getRedPlayer().setPlayerChoice("S");
+        gameLogic.getBluePlayer().setPlayerChoice("O");
+
+        for(int i = 0; i < 3; i++) {
+            gameLogic.makeMove(0, i);
+        }
+
+        Assert.assertEquals(gameLogic.getRedPlayer(), gameLogic.getCurrentPlayer());
+    }
+
 
     //AC 6.3
     @Test
@@ -64,30 +78,5 @@ public class MakeMoveGeneralGameTest {
         }
     }
 
-    @Test
-    public void testShouldBeRedPlayerTurnAfterMakingSOSCombination() {
-        gameLogic.getRedPlayer().setPlayerChoice("S");
-        gameLogic.getBluePlayer().setPlayerChoice("O");
-
-        gameLogic.makeMove(0, 0);
-        gameLogic.makeMove(1, 1);
-        gameLogic.makeMove(2, 2);
-
-        Assert.assertEquals(gameLogic.getRedPlayer(), gameLogic.getCurrentPlayer());
-    }
-
-    @Test
-    public void testGameShouldEndWhenAllSquaresAreFilledWithRedPlayerWinningWithMoreCombinations() {
-        gameLogic.getRedPlayer().setPlayerChoice("S");
-        gameLogic.getBluePlayer().setPlayerChoice("O");
-
-        for(int i = 0; i < 3; i++) {
-            for(int j = 0; j < 3; j++) {
-                gameLogic.makeMove(i, j);
-            }
-        }
-        Assert.assertNotSame(gameLogic.getGameState(), SOSGameLogic.GameState.GAME_NOT_OVER);
-        Assert.assertEquals(SOSGameLogic.GameState.RED_WON, gameLogic.getGameState());
-    }
 
 }

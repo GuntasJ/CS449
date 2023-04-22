@@ -1,6 +1,9 @@
 package driver;
 
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMaterialDarkerContrastIJTheme;
+import gamelogic.GeneralSOSGameLogic;
+import gamelogic.SOSGameLogic;
+import gamelogic.SimpleSOSGameLogic;
 import graphics.GameFrame;
 
 import javax.swing.SwingUtilities;
