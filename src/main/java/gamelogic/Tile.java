@@ -30,6 +30,10 @@ public class Tile {
         combinations.add(new SOSCombination(player, direction));
     }
 
+    public boolean isSelectionEmpty() {
+        return selection.equals(" ");
+    }
+
     public List<SOSCombination> getCombinations() {
         return combinations;
     }

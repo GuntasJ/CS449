@@ -1,22 +1,22 @@
 package gamelogic;
 
-public class Player {
+public abstract class Player {
 
-    private final PlayerColor playerColor;
-    private final PlayerType playerType;
-    private String playerChoice;
+    protected final PlayerColor playerColor;
+    protected final PlayerType playerType;
+    protected String playerChoice;
+    protected Tile[][] gameBoard;
     private int totalSOSCombinations;
 
-    public Player(PlayerColor playerColor, PlayerType playerType, String playerChoice) {
+    protected Player(PlayerColor playerColor, PlayerType playerType, String playerChoice, Tile[][] gameBoard) {
         this.playerColor = playerColor;
         this.playerType = playerType;
         this.playerChoice = playerChoice;
+        this.gameBoard = gameBoard;
         totalSOSCombinations = 0;
     }
 
-    public Move makeMove(int x, int y) {
-        return new Move(x, y, playerChoice, playerColor, playerType);
-    }
+    public abstract Move makeMove(int x, int y);
 
     private void validatePlayerChoiceIsValid(String playerChoice) {
         if(!playerChoice.equals("O") && !playerChoice.equals("S")) {
@@ -35,6 +35,10 @@ public class Player {
 
     public PlayerColor getPlayerColor() {
         return playerColor;
+    }
+
+    public PlayerType getPlayerType() {
+        return playerType;
     }
 
     public int getTotalSOSCombinations() {
@@ -63,10 +67,5 @@ public class Player {
         public String toString() {
             return label;
         }
-    }
-
-    public enum PlayerType {
-        HUMAN_PLAYER,
-        COMPUTER_PLAYER
     }
 }

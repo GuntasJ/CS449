@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MakeMoveSimpleGameTest {
+public class MakeHumanMoveSimpleGameTest {
 
     SOSGameLogic gameLogic;
 
@@ -26,7 +26,7 @@ public class MakeMoveSimpleGameTest {
     public void testSuccessfulMoveInSimpleGame() {
         String selection = "S";
         gameLogic.getCurrentPlayer().setPlayerChoice(selection);
-        gameLogic.makeMove(1, 1);
+        gameLogic.makeHumanMove(1, 1);
         Assert.assertEquals("S", gameLogic.getGameBoard()[1][1].getSelection());
     }
 
@@ -35,9 +35,9 @@ public class MakeMoveSimpleGameTest {
     public void testInvalidMoveOnNonEmptyTileInSimpleGame() {
         String selection = "S";
         gameLogic.getCurrentPlayer().setPlayerChoice(selection);
-        gameLogic.makeMove(1, 1);
+        gameLogic.makeHumanMove(1, 1);
         try {
-            gameLogic.makeMove(1, 1);
+            gameLogic.makeHumanMove(1, 1);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Choice must be placed on empty square.", e.getMessage());
         }
@@ -47,7 +47,7 @@ public class MakeMoveSimpleGameTest {
     @Test
     public void testInvalidMoveWithNoSelectionOnValidTileInSimpleGame() {
         try {
-            gameLogic.makeMove(1, 1);
+            gameLogic.makeHumanMove(1, 1);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Selection cannot be null.", e.getMessage());
         }
@@ -58,7 +58,7 @@ public class MakeMoveSimpleGameTest {
         testSuccessfulMoveInSimpleGame();
         try {
             gameLogic.getCurrentPlayer().setPlayerChoice(" ");
-            gameLogic.makeMove(1, 1);
+            gameLogic.makeHumanMove(1, 1);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Current choice must be S or O", e.getMessage());
         }

@@ -25,7 +25,18 @@ public class GeneralSOSGameLogic extends SOSGameLogic {
     }
 
     @Override
-    public void makeMove(int row, int col) {
+    public void makeComputerMove() {
+        int previousCombinationNumber = currentPlayer.getTotalSOSCombinations();
+        executeMove(currentPlayer.makeMove(0, 0));
+        SOSGameUtils.checkForAndMarkCombination(gameBoard, currentPlayer);
+        gameState = checkForWinner();
+        if(currentPlayer.getTotalSOSCombinations() == previousCombinationNumber) {
+            switchPlayer();
+        }
+    }
+
+    @Override
+    public void makeHumanMove(int row, int col) {
         checkForValidMove(row, col);
         int previousCombinationNumber = currentPlayer.getTotalSOSCombinations();
         executeMove(currentPlayer.makeMove(row, col));

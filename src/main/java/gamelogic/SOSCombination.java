@@ -1,5 +1,3 @@
 package gamelogic;
 
-public record SOSCombination(Player playerOfCombination, Direction combinationDirection) {
-
-}
+public record SOSCombination(Player playerOfCombination, Direction combinationDirection) {}

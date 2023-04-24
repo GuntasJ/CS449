@@ -8,7 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.*;
 
-public class GamePanel extends JPanel {
+public class GamePanel extends JPanel implements Runnable {
 
     private final JPanel northPanel;
     private final JPanel westPanel;
@@ -28,11 +28,21 @@ public class GamePanel extends JPanel {
     private final JRadioButton bluePlayerSRadioButton;
     private final JRadioButton bluePlayerORadioButton;
 
+    private final ButtonGroup redPlayerComputerHumanButtonGroup;
+    private final JRadioButton redPlayerComputerButton;
+    private final JRadioButton redPlayerHumanButton;
+
+    private final ButtonGroup bluePlayerComputerHumanButtonGroup;
+    private final JRadioButton bluePlayerComputerButton;
+    private final JRadioButton bluePlayerHumanButton;
+
     private final JLabel buttonGroupLabel;
     private final JLabel boardSizeLabel;
     private final JLabel redPlayerLabel;
     private final JLabel bluePlayerLabel;
     private final JLabel currentPlayerTurnLabel;
+    private final JLabel redScoreLabel;
+    private final JLabel blueScoreLabel;
 
     private final JTextField boardSizeTextField;
 
@@ -40,7 +50,11 @@ public class GamePanel extends JPanel {
 
     private final ActionListener makeSOSTiles;
 
-    private SOSGameLogic gameLogic;
+    private volatile SOSGameLogic gameLogic;
+
+    private Thread computerPlayerThread = new Thread(this);
+
+    private boolean isGameOver;
 
     GamePanel() {
         northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 13));
@@ -54,6 +68,9 @@ public class GamePanel extends JPanel {
         redPlayerLabel = new JLabel("Red Player");
         bluePlayerLabel = new JLabel("Blue Player");
         currentPlayerTurnLabel = new JLabel("Current Player: ");
+        redScoreLabel = new JLabel("Red Score: 0");
+        blueScoreLabel = new JLabel("Blue Score: 0");
+
 
         gameTypeRadioButtonGroup = new ButtonGroup();
         gameTypeGeneralRadioButton = new JRadioButton("General Game");
@@ -67,15 +84,41 @@ public class GamePanel extends JPanel {
         bluePlayerORadioButton = new JRadioButton("O");
         bluePlayerSRadioButton = new JRadioButton("S");
 
+        redPlayerComputerHumanButtonGroup = new ButtonGroup();
+        redPlayerComputerButton = new JRadioButton("Computer");
+        redPlayerHumanButton = new JRadioButton("Human");
+
+        bluePlayerComputerHumanButtonGroup = new ButtonGroup();
+        bluePlayerComputerButton = new JRadioButton("Computer");
+        bluePlayerHumanButton = new JRadioButton("Human");
+
+
         boardSizeTextField = new JTextField();
 
         newGameButton = new JButton("New Game");
 
         makeSOSTiles = e -> {
+            computerPlayerThread = new Thread(this);
+
+            SOSGameLogic.PlayerTypeMode playerTypeMode;
+
+            if(redPlayerHumanButton.isSelected() && bluePlayerHumanButton.isSelected()) {
+                playerTypeMode = SOSGameLogic.PlayerTypeMode.ALL_HUMAN;
+            }
+            else if(redPlayerComputerButton.isSelected() && bluePlayerHumanButton.isSelected()) {
+                playerTypeMode = SOSGameLogic.PlayerTypeMode.RED_COMPUTER_BLUE_HUMAN;
+            }
+            else if(redPlayerHumanButton.isSelected() && bluePlayerComputerButton.isSelected()) {
+                playerTypeMode = SOSGameLogic.PlayerTypeMode.RED_HUMAN_BLUE_COMPUTER;
+            }
+            else {
+                playerTypeMode = SOSGameLogic.PlayerTypeMode.ALL_COMPUTER;
+            }
+
             gameLogic = SOSGameLogic.newBuilder()
                     .setSize(Integer.parseInt(boardSizeTextField.getText()))
                     .setGameMode(gameTypeSimpleRadioButton.isSelected() ? GameMode.SIMPLE : GameMode.GENERAL)
-                    .setPlayerTypeMode(SOSGameLogic.PlayerTypeMode.ALL_HUMAN)
+                    .setPlayerTypeMode(playerTypeMode)
                     .setStartingPlayer(Player.PlayerColor.RED_PLAYER)
                     .build();
 
@@ -94,7 +137,20 @@ public class GamePanel extends JPanel {
 
             currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getCurrentPlayer());
 
-            centerPanel.revalidate();
+            isGameOver = false;
+
+            redPlayerHumanButton.setEnabled(false);
+            redPlayerComputerButton.setEnabled(false);
+
+            bluePlayerHumanButton.setEnabled(false);
+            bluePlayerComputerButton.setEnabled(false);
+
+            gameTypeSimpleRadioButton.setEnabled(false);
+            gameTypeGeneralRadioButton.setEnabled(false);
+
+            boardSizeTextField.setEnabled(false);
+
+            computerPlayerThread.start();
         };
 
 
@@ -111,29 +167,23 @@ public class GamePanel extends JPanel {
     }
 
     private void setUpNorthPanelAndComponents() {
-        //top panel
         northPanel.setPreferredSize(GraphicConstants.NORTH_PANEL_BOUNDS);
 
-        //labels
         buttonGroupLabel.setText("SOS: ");
         buttonGroupLabel.setPreferredSize(GraphicConstants.BUTTON_GROUP_LABEL_BOUNDS);
         boardSizeLabel.setPreferredSize(GraphicConstants.BOARD_SIZE_LABEL_BOUNDS);
 
-
-        //radio button
 
         gameTypeSimpleRadioButton.setPreferredSize(GraphicConstants.RADIO_BUTTON_GAME_TYPE_BOUNDS);
         gameTypeGeneralRadioButton.setPreferredSize(GraphicConstants.RADIO_BUTTON_GAME_TYPE_BOUNDS);
         gameTypeSimpleRadioButton.setFocusPainted(false);
         gameTypeGeneralRadioButton.setFocusPainted(false);
 
-        //Text field
         boardSizeTextField.setPreferredSize(GraphicConstants.TEXT_FIELD_BOUNDS);
         boardSizeTextField.setEditable(true);
         boardSizeTextField.addActionListener(makeSOSTiles);
 
 
-        //adding them
         northPanel.add(buttonGroupLabel);
 
         gameTypeRadioButtonGroup.add(gameTypeSimpleRadioButton);
@@ -154,13 +204,23 @@ public class GamePanel extends JPanel {
     }
 
     private void setUpEastPanelAndComponents() {
-        helpSetUpEastWestLabelAndPanel(eastPanel, redPlayerLabel);
+        helpSetUpEastWestLabelAndPanel(eastPanel, redPlayerLabel, redScoreLabel);
 
         redPlayerORadioButton.addActionListener(e ->  {
             if(gameLogic != null) gameLogic.getRedPlayer().setPlayerChoice("O");
         });
         redPlayerSRadioButton.addActionListener(e -> {
             if(gameLogic != null) gameLogic.getRedPlayer().setPlayerChoice("S");
+        });
+
+        redPlayerComputerButton.addActionListener( e -> {
+            redPlayerORadioButton.setEnabled(false);
+            redPlayerSRadioButton.setEnabled(false);
+        });
+
+        redPlayerHumanButton.addActionListener(e -> {
+            redPlayerORadioButton.setEnabled(true);
+            redPlayerSRadioButton.setEnabled(true);
         });
 
         redPlayerButtonGroup.add(redPlayerORadioButton);
@@ -170,25 +230,41 @@ public class GamePanel extends JPanel {
         eastPanel.add(redPlayerSRadioButton);
         eastPanel.add(redPlayerORadioButton);
 
+        redPlayerComputerHumanButtonGroup.add(redPlayerHumanButton);
+        redPlayerComputerHumanButtonGroup.add(redPlayerComputerButton);
+        redPlayerHumanButton.setSelected(true);
+
+        eastPanel.add(Box.createRigidArea(new Dimension(0, 25)));
+
+        eastPanel.add(redPlayerHumanButton);
+        eastPanel.add(redPlayerComputerButton);
+
         add(eastPanel, BorderLayout.EAST);
     }
 
-    private void helpSetUpEastWestLabelAndPanel(JPanel eastPanel, JLabel redPlayerLabel) {
-        eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.Y_AXIS));
-        eastPanel.setPreferredSize(new Dimension(150, 200));
+    private void helpSetUpEastWestLabelAndPanel(JPanel panel, JLabel playerLabel, JLabel scoreLabel) {
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setPreferredSize(new Dimension(150, 200));
 
-        redPlayerLabel.setAlignmentX(CENTER_ALIGNMENT);
-        redPlayerLabel.setFont(redPlayerLabel.getFont().deriveFont(20f));
+        playerLabel.setAlignmentX(CENTER_ALIGNMENT);
+        playerLabel.setFont(playerLabel.getFont().deriveFont(20f));
 
-        eastPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+        panel.add(Box.createRigidArea(new Dimension(0, 50)));
 
-        eastPanel.add(redPlayerLabel);
+        panel.add(playerLabel);
 
-        eastPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+        panel.add(Box.createRigidArea(new Dimension(0, 50)));
+
+        scoreLabel.setAlignmentX(CENTER_ALIGNMENT);
+
+        panel.add(scoreLabel);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 50)));
+
     }
 
     private void setUpWestPanelAndComponents() {
-        helpSetUpEastWestLabelAndPanel(westPanel, bluePlayerLabel);
+        helpSetUpEastWestLabelAndPanel(westPanel, bluePlayerLabel, blueScoreLabel);
 
         bluePlayerORadioButton.addActionListener(e -> {
             if(gameLogic != null) gameLogic.getBluePlayer().setPlayerChoice("O");
@@ -197,12 +273,31 @@ public class GamePanel extends JPanel {
             if(gameLogic != null) gameLogic.getBluePlayer().setPlayerChoice("S");
         });
 
+        bluePlayerComputerButton.addActionListener( e -> {
+            bluePlayerORadioButton.setEnabled(false);
+            bluePlayerSRadioButton.setEnabled(false);
+        });
+
+        bluePlayerHumanButton.addActionListener(e -> {
+            bluePlayerORadioButton.setEnabled(true);
+            bluePlayerSRadioButton.setEnabled(true);
+        });
+
         bluePlayerButtonGroup.add(bluePlayerORadioButton);
         bluePlayerButtonGroup.add(bluePlayerSRadioButton);
         bluePlayerSRadioButton.setSelected(true);
 
         westPanel.add(bluePlayerSRadioButton);
         westPanel.add(bluePlayerORadioButton);
+
+        bluePlayerComputerHumanButtonGroup.add(bluePlayerHumanButton);
+        bluePlayerComputerHumanButtonGroup.add(bluePlayerComputerButton);
+        bluePlayerHumanButton.setSelected(true);
+
+        westPanel.add(Box.createRigidArea(new Dimension(0, 25)));
+
+        westPanel.add(bluePlayerHumanButton);
+        westPanel.add(bluePlayerComputerButton);
 
         add(westPanel, BorderLayout.WEST);
 
@@ -252,9 +347,68 @@ public class GamePanel extends JPanel {
         gameFrame.dispose();
     }
 
+    private void repaintTiles() {
+        for(Component c : centerPanel.getComponents()) {
+            c.repaint();
+        }
+    }
+
+    private void endGame() {
+        System.out.println(gameLogic.getGameState());
+        isGameOver = true;
+        SwingUtilities.invokeLater(
+                () -> new MenuFrame(gameLogic.getGameState()).setVisible(true)
+        );
+        disposeFrame();
+    }
+
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+    }
+
+    @Override
+    public void run() {
+        boolean isRedComputer = gameLogic.getRedPlayer().getPlayerType() == PlayerType.COMPUTER_PLAYER;
+        boolean isBlueComputer = gameLogic.getBluePlayer().getPlayerType() == PlayerType.COMPUTER_PLAYER;
+
+        while(!isGameOver) {
+            if (!isRedComputer && isBlueComputer) {
+                if (gameLogic.getCurrentPlayer() == gameLogic.getBluePlayer()) {
+                    makeComputerPlay();
+                }
+            }
+            if (isRedComputer && !isBlueComputer) {
+                if (gameLogic.getCurrentPlayer() == gameLogic.getRedPlayer()) {
+                    makeComputerPlay();
+                }
+            }
+            if (isRedComputer && isBlueComputer) {
+                makeComputerPlay();
+            }
+        }
+    }
+
+    private void updateVisualGameStatistics() {
+        currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getCurrentPlayer());
+        redScoreLabel.setText("Red Score: " + gameLogic.getRedPlayer().getTotalSOSCombinations());
+        blueScoreLabel.setText("Blue Score: " + gameLogic.getBluePlayer().getTotalSOSCombinations());
+    }
+
+    private void makeComputerPlay() {
+        try {
+            Thread.sleep(250);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        gameLogic.makeComputerMove();
+        updateVisualGameStatistics();
+        repaintTiles();
+        if(gameLogic.getGameState() != SOSGameLogic.GameState.GAME_NOT_OVER) {
+            endGame();
+            isGameOver = true;
+        }
     }
 
     private class SOSGameTile extends JPanel {
@@ -268,20 +422,13 @@ public class GamePanel extends JPanel {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getCurrentPlayer());
+                    updateVisualGameStatistics();
                     int[] cords = SOSGameUtils.convertOneDIndexToTwoD(index, gameLogic.getSize());
-
-                    gameLogic.makeMove(cords[0], cords[1]);
-
+                    gameLogic.makeHumanMove(cords[0], cords[1]);
                     if(gameLogic.getGameState() != SOSGameLogic.GameState.GAME_NOT_OVER) {
-                        System.out.println(gameLogic.getGameState());
-                        SwingUtilities.invokeLater(
-                                () -> new MenuFrame(gameLogic.getGameState()).setVisible(true)
-                        );
-                        disposeFrame();
+                        endGame();
                     }
-
-                    currentPlayerTurnLabel.setText("Current Player: " + gameLogic.getCurrentPlayer());
+                    updateVisualGameStatistics();
                     repaint();
                     getParent().repaint();
                 }

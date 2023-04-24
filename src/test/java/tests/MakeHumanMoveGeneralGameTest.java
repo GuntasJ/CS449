@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MakeMoveGeneralGameTest {
+public class MakeHumanMoveGeneralGameTest {
 
     SOSGameLogic gameLogic;
 
@@ -26,7 +26,7 @@ public class MakeMoveGeneralGameTest {
     public void testSuccessfulMoveInGeneralGame() {
         String selection = "S";
         gameLogic.getCurrentPlayer().setPlayerChoice(selection);
-        gameLogic.makeMove(1, 1);
+        gameLogic.makeHumanMove(1, 1);
         Assert.assertEquals("S", gameLogic.getGameBoard()[1][1].getSelection());
     }
 
@@ -37,7 +37,7 @@ public class MakeMoveGeneralGameTest {
         gameLogic.getBluePlayer().setPlayerChoice("O");
 
         for(int i = 0; i < 3; i++) {
-            gameLogic.makeMove(0, i);
+            gameLogic.makeHumanMove(0, i);
         }
 
         Assert.assertEquals(gameLogic.getRedPlayer(), gameLogic.getCurrentPlayer());
@@ -49,9 +49,9 @@ public class MakeMoveGeneralGameTest {
     public void testInvalidMoveOnNonEmptyTileInGeneralGame() {
         String selection = "S";
         gameLogic.getCurrentPlayer().setPlayerChoice(selection);
-        gameLogic.makeMove(1, 1);
+        gameLogic.makeHumanMove(1, 1);
         try {
-            gameLogic.makeMove(1, 1);
+            gameLogic.makeHumanMove(1, 1);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Choice must be placed on empty square.", e.getMessage());
         }
@@ -61,7 +61,7 @@ public class MakeMoveGeneralGameTest {
     @Test
     public void testInvalidMoveWithNoSelectionOnValidTileInGeneralGame() {
         try {
-            gameLogic.makeMove(1, 1);
+            gameLogic.makeHumanMove(1, 1);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Selection cannot be null.", e.getMessage());
         }
@@ -72,7 +72,7 @@ public class MakeMoveGeneralGameTest {
         testSuccessfulMoveInGeneralGame();
         try {
             gameLogic.getCurrentPlayer().setPlayerChoice(" ");
-            gameLogic.makeMove(1, 1);
+            gameLogic.makeHumanMove(1, 1);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Current choice must be S or O", e.getMessage());
         }

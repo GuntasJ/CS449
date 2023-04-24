@@ -5,8 +5,6 @@ public class SimpleSOSGameLogic extends SOSGameLogic {
         super(size, GameMode.SIMPLE, playerTypeMode, currentPlayer);
     }
 
-
-
     @Override
     public GameState checkForWinner() {
         for (Tile[] tiles : gameBoard) {
@@ -31,7 +29,15 @@ public class SimpleSOSGameLogic extends SOSGameLogic {
     }
 
     @Override
-    public void makeMove(int row, int col) {
+    public void makeComputerMove() {
+        executeMove(currentPlayer.makeMove(0, 0));
+        SOSGameUtils.checkForAndMarkCombination(gameBoard, currentPlayer);
+        gameState = checkForWinner();
+        switchPlayer();
+    }
+
+    @Override
+    public void makeHumanMove(int row, int col) {
         checkForValidMove(row, col);
         executeMove(currentPlayer.makeMove(row, col));
         SOSGameUtils.checkForAndMarkCombination(gameBoard, currentPlayer);

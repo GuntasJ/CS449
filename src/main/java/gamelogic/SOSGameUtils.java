@@ -1,5 +1,7 @@
 package gamelogic;
 
+import java.util.function.Predicate;
+
 public class SOSGameUtils {
 
     public static int[] convertOneDIndexToTwoD(int index, int arraySize) {
@@ -13,6 +15,9 @@ public class SOSGameUtils {
     15, 16, 17, 18, 19,
     20, 21, 22, 23, 24
      */
+
+
+
 
     public static void checkForAndMarkCombination(Tile[][] gameBoard, Player player) {
         checkAndMarkThreeInRow(gameBoard, player);

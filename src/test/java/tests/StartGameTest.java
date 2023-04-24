@@ -44,7 +44,7 @@ public class StartGameTest {
         gameLogic.getRedPlayer().setPlayerChoice("S");
         gameLogic.setGameMode(null);
         try {
-            gameLogic.makeMove(1, 1);
+            gameLogic.makeHumanMove(1, 1);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Game mode cannot be null.", e.getMessage());
         }

@@ -29,7 +29,7 @@ public class GameOverGeneralTest {
 
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
-                gameLogic.makeMove(i, j);
+                gameLogic.makeHumanMove(i, j);
             }
         }
         Assert.assertNotSame(gameLogic.getGameState(), SOSGameLogic.GameState.GAME_NOT_OVER);
@@ -43,17 +43,17 @@ public class GameOverGeneralTest {
         gameLogic.getBluePlayer().setPlayerChoice("O");
 
         for(int i = 0; i < 3; i++) {
-            gameLogic.makeMove(0, i);
+            gameLogic.makeHumanMove(0, i);
         }
 
-        gameLogic.makeMove(1, 0); // red
-        gameLogic.makeMove(1, 1); // blue
+        gameLogic.makeHumanMove(1, 0); // red
+        gameLogic.makeHumanMove(1, 1); // blue
         gameLogic.getCurrentPlayer().setPlayerChoice("O"); //red
-        gameLogic.makeMove(2, 0); //red
+        gameLogic.makeHumanMove(2, 0); //red
         gameLogic.getCurrentPlayer().setPlayerChoice("S"); //blue
-        gameLogic.makeMove(1, 2); //blue
-        gameLogic.makeMove(2, 1); //blue
-        gameLogic.makeMove(2, 2); //red
+        gameLogic.makeHumanMove(1, 2); //blue
+        gameLogic.makeHumanMove(2, 1); //blue
+        gameLogic.makeHumanMove(2, 2); //red
 
         Assert.assertEquals(SOSGameLogic.GameState.TIE, gameLogic.getGameState());
         /*

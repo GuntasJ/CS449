@@ -18,12 +18,11 @@ public abstract class SOSGameLogic {
         this.gameMode = gameMode;
         this.gameState = GameState.GAME_NOT_OVER;
 
-        determinePlayerConfiguration(playerTypeMode);
-
-        this.currentPlayer = currentPlayer == Player.PlayerColor.RED_PLAYER ? redPlayer : bluePlayer;
-
         setSize(size);
         clearBoard();
+
+        determinePlayerConfiguration(playerTypeMode);
+        this.currentPlayer = currentPlayer == Player.PlayerColor.RED_PLAYER ? redPlayer : bluePlayer;
     }
 
 
@@ -73,27 +72,27 @@ public abstract class SOSGameLogic {
         switch(playerTypeMode) {
             case ALL_HUMAN -> {
                 redPlayer =
-                        new Player(Player.PlayerColor.RED_PLAYER, Player.PlayerType.HUMAN_PLAYER, "");
+                        new HumanPlayer(Player.PlayerColor.RED_PLAYER, "", gameBoard);
                 bluePlayer =
-                        new Player(Player.PlayerColor.BLUE_PLAYER, Player.PlayerType.HUMAN_PLAYER, "");
+                        new HumanPlayer(Player.PlayerColor.BLUE_PLAYER, "", gameBoard);
             }
             case ALL_COMPUTER -> {
                 redPlayer =
-                        new Player(Player.PlayerColor.RED_PLAYER, Player.PlayerType.COMPUTER_PLAYER, "");
+                        new ComputerPlayer(Player.PlayerColor.RED_PLAYER, "", gameBoard);
                 bluePlayer =
-                        new Player(Player.PlayerColor.BLUE_PLAYER, Player.PlayerType.COMPUTER_PLAYER, "");
+                        new ComputerPlayer(Player.PlayerColor.BLUE_PLAYER, "", gameBoard);
             }
             case RED_HUMAN_BLUE_COMPUTER -> {
                 redPlayer =
-                        new Player(Player.PlayerColor.RED_PLAYER, Player.PlayerType.HUMAN_PLAYER, "");
+                        new HumanPlayer(Player.PlayerColor.RED_PLAYER, "", gameBoard);
                 bluePlayer =
-                        new Player(Player.PlayerColor.BLUE_PLAYER, Player.PlayerType.COMPUTER_PLAYER, "");
+                        new ComputerPlayer(Player.PlayerColor.BLUE_PLAYER, "", gameBoard);
             }
             case RED_COMPUTER_BLUE_HUMAN -> {
                 redPlayer =
-                        new Player(Player.PlayerColor.RED_PLAYER, Player.PlayerType.COMPUTER_PLAYER, "");
+                        new ComputerPlayer(Player.PlayerColor.RED_PLAYER, "", gameBoard);
                 bluePlayer =
-                        new Player(Player.PlayerColor.BLUE_PLAYER, Player.PlayerType.HUMAN_PLAYER, "");
+                        new HumanPlayer(Player.PlayerColor.BLUE_PLAYER, "", gameBoard);
             }
         }
     }
@@ -121,7 +120,9 @@ public abstract class SOSGameLogic {
         gameBoard[move.x()][move.y()].setSelection(move.choice());
     }
 
-    public abstract void makeMove(int row, int col);
+    //public abstract void makeMove(int row, int col);
+    public abstract void makeComputerMove();
+    public abstract void makeHumanMove(int row, int col);
 
     protected void checkForValidMove(int row, int col) {
         if (row < 0 || row > gameBoard.length || col < 0 || col > gameBoard[0].length) {

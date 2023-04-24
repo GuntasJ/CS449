@@ -27,9 +27,9 @@ public class GameOverSimpleTest {
         gameLogic.getRedPlayer().setPlayerChoice("S");
         gameLogic.getBluePlayer().setPlayerChoice("O");
 
-        gameLogic.makeMove(0,0);
-        gameLogic.makeMove(0, 1);
-        gameLogic.makeMove(0, 2);
+        gameLogic.makeHumanMove(0,0);
+        gameLogic.makeHumanMove(0, 1);
+        gameLogic.makeHumanMove(0, 2);
 
         Assert.assertNotSame(SOSGameLogic.GameState.GAME_NOT_OVER, gameLogic.getGameState());
         Assert.assertEquals(SOSGameLogic.GameState.RED_WON, gameLogic.getGameState());
@@ -43,7 +43,7 @@ public class GameOverSimpleTest {
 
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
-                gameLogic.makeMove(i, j);
+                gameLogic.makeHumanMove(i, j);
             }
         }
 
