@@ -27,7 +27,9 @@ public class GeneralSOSGameLogic extends SOSGameLogic {
     @Override
     public void makeComputerMove() {
         int previousCombinationNumber = currentPlayer.getTotalSOSCombinations();
-        executeMove(currentPlayer.makeMove(0, 0));
+        Move move = currentPlayer.makeMove(0, 0);
+        executeMove(move);
+        moveList.add(move);
         SOSGameUtils.checkForAndMarkCombination(gameBoard, currentPlayer);
         gameState = checkForWinner();
         if(currentPlayer.getTotalSOSCombinations() == previousCombinationNumber) {
@@ -39,7 +41,9 @@ public class GeneralSOSGameLogic extends SOSGameLogic {
     public void makeHumanMove(int row, int col) {
         checkForValidMove(row, col);
         int previousCombinationNumber = currentPlayer.getTotalSOSCombinations();
-        executeMove(currentPlayer.makeMove(row, col));
+        Move move = currentPlayer.makeMove(row, col);
+        executeMove(move);
+        moveList.add(move);
         SOSGameUtils.checkForAndMarkCombination(gameBoard, currentPlayer);
         gameState = checkForWinner();
         if(currentPlayer.getTotalSOSCombinations() == previousCombinationNumber) {

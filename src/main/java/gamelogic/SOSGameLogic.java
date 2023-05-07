@@ -1,6 +1,8 @@
 package gamelogic;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public abstract class SOSGameLogic {
 
@@ -11,12 +13,15 @@ public abstract class SOSGameLogic {
     protected GameMode gameMode;
     protected GameState gameState;
 
+    protected List<Move> moveList;
+
     private int size;
 
     protected SOSGameLogic(int size, GameMode gameMode, PlayerTypeMode playerTypeMode, Player.PlayerColor currentPlayer) {
         this.size = size;
         this.gameMode = gameMode;
         this.gameState = GameState.GAME_NOT_OVER;
+        this.moveList = new ArrayList<>();
 
         setSize(size);
         clearBoard();
@@ -174,6 +179,14 @@ public abstract class SOSGameLogic {
 
     public Player getBluePlayer() {
         return bluePlayer;
+    }
+
+    public List<Move> getMoveList() {
+        return moveList;
+    }
+
+    public GameMode getGameMode() {
+        return gameMode;
     }
 
     public enum PlayerTypeMode {

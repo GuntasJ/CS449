@@ -36,6 +36,8 @@ public class GamePanel extends JPanel implements Runnable {
     private final JRadioButton bluePlayerComputerButton;
     private final JRadioButton bluePlayerHumanButton;
 
+    private final JCheckBox recordGameCheckBox;
+
     private final JLabel buttonGroupLabel;
     private final JLabel boardSizeLabel;
     private final JLabel redPlayerLabel;
@@ -47,10 +49,12 @@ public class GamePanel extends JPanel implements Runnable {
     private final JTextField boardSizeTextField;
 
     private final JButton newGameButton;
+    private final JButton replayGameButton;
 
     private final ActionListener makeSOSTiles;
 
     private volatile SOSGameLogic gameLogic;
+    private volatile SOSGameRecorder gameRecorder;
 
     private Thread computerPlayerThread = new Thread(this);
 
@@ -92,10 +96,12 @@ public class GamePanel extends JPanel implements Runnable {
         bluePlayerComputerButton = new JRadioButton("Computer");
         bluePlayerHumanButton = new JRadioButton("Human");
 
+        recordGameCheckBox = new JCheckBox("Record Game");
 
         boardSizeTextField = new JTextField();
 
         newGameButton = new JButton("New Game");
+        replayGameButton = new JButton("Replay Game");
 
         makeSOSTiles = e -> {
             computerPlayerThread = new Thread(this);
@@ -125,7 +131,6 @@ public class GamePanel extends JPanel implements Runnable {
             gameLogic.getRedPlayer().setPlayerChoice(redPlayerSRadioButton.isSelected() ? "S" : "O");
             gameLogic.getBluePlayer().setPlayerChoice(bluePlayerSRadioButton.isSelected() ? "S" : "O");
 
-            System.out.println(gameLogic);
 
             centerPanel.removeAll();
             centerPanel.setLayout(new GridLayout(gameLogic.getSize(), gameLogic.getSize()));
@@ -150,7 +155,12 @@ public class GamePanel extends JPanel implements Runnable {
 
             boardSizeTextField.setEnabled(false);
 
+            recordGameCheckBox.setEnabled(false);
+
             computerPlayerThread.start();
+            if(recordGameCheckBox.isSelected()) {
+                gameRecorder = new SOSGameRecorder(gameLogic);
+            }
         };
 
 
@@ -307,11 +317,43 @@ public class GamePanel extends JPanel implements Runnable {
         newGameButton.setFocusPainted(false);
         newGameButton.addActionListener(makeSOSTiles);
 
+        southPanel.add(recordGameCheckBox);
+
         southPanel.add(currentPlayerTurnLabel);
 
-        southPanel.add(Box.createRigidArea(new Dimension(200, 0)));
+        southPanel.add(Box.createRigidArea(new Dimension(100, 0)));
 
         southPanel.add(newGameButton);
+
+        replayGameButton.addActionListener(e -> {
+                    Thread thread = new Thread(() -> {
+                        GameFrame gameFrame = new GameFrame();
+                        gameFrame.setVisible(true);
+
+                        gameFrame.getPanel().getBoardSizeTextField().setText(String.valueOf(gameLogic.getSize()));
+                        if (gameTypeSimpleRadioButton.isSelected()) {
+                            gameFrame.getPanel().getGameTypeSimpleRadioButton().setSelected(true);
+                        } else {
+                            gameFrame.getPanel().getGameTypeGeneralRadioButton().setSelected(true);
+                        }
+
+                        gameFrame.getPanel().getNewGameButton().doClick();
+
+                        for(Move move : gameLogic.getMoveList()) {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
+                            gameFrame.getPanel().makeReplayPlay(move);
+                        }
+                    });
+
+                    thread.start();
+                });
+
+        southPanel.add(replayGameButton);
+
 
 
         southPanel.setPreferredSize(GraphicConstants.SOUTH_PANEL_BOUNDS);
@@ -342,6 +384,10 @@ public class GamePanel extends JPanel implements Runnable {
         return boardSizeTextField;
     }
 
+    public JButton getNewGameButton() {
+        return newGameButton;
+    }
+
     private void disposeFrame() {
         GameFrame gameFrame = (GameFrame) SwingUtilities.getWindowAncestor(this);
         gameFrame.dispose();
@@ -352,6 +398,7 @@ public class GamePanel extends JPanel implements Runnable {
             c.repaint();
         }
     }
+
 
     private void endGame() {
         System.out.println(gameLogic.getGameState());
@@ -400,15 +447,25 @@ public class GamePanel extends JPanel implements Runnable {
         try {
             Thread.sleep(250);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         gameLogic.makeComputerMove();
+        if(recordGameCheckBox.isSelected()) {
+            gameRecorder.recordCurrentGameState();
+        }
         updateVisualGameStatistics();
         repaintTiles();
         if(gameLogic.getGameState() != SOSGameLogic.GameState.GAME_NOT_OVER) {
             endGame();
             isGameOver = true;
         }
+    }
+
+    public void makeReplayPlay(Move move) {
+        gameLogic.getCurrentPlayer().setPlayerChoice(move.choice());
+        gameLogic.makeHumanMove(move.x(), move.y());
+        updateVisualGameStatistics();
+        repaintTiles();
     }
 
     private class SOSGameTile extends JPanel {
@@ -425,6 +482,10 @@ public class GamePanel extends JPanel implements Runnable {
                     updateVisualGameStatistics();
                     int[] cords = SOSGameUtils.convertOneDIndexToTwoD(index, gameLogic.getSize());
                     gameLogic.makeHumanMove(cords[0], cords[1]);
+                    if(recordGameCheckBox.isSelected()) {
+                        gameRecorder.recordCurrentGameState();
+                    }
+
                     if(gameLogic.getGameState() != SOSGameLogic.GameState.GAME_NOT_OVER) {
                         endGame();
                     }

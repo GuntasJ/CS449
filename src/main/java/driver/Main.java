@@ -3,16 +3,24 @@ package driver;
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMaterialDarkerContrastIJTheme;
 import gamelogic.GeneralSOSGameLogic;
 import gamelogic.SOSGameLogic;
+import gamelogic.SOSGameRecorder;
 import gamelogic.SimpleSOSGameLogic;
 import graphics.GameFrame;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.net.http.HttpClient;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if(System.getProperty("os.name").equals("Mac OS X")) {
             macOSSetUp();
         }

@@ -30,7 +30,9 @@ public class SimpleSOSGameLogic extends SOSGameLogic {
 
     @Override
     public void makeComputerMove() {
-        executeMove(currentPlayer.makeMove(0, 0));
+        Move move = currentPlayer.makeMove(0, 0);
+        executeMove(move);
+        moveList.add(move);
         SOSGameUtils.checkForAndMarkCombination(gameBoard, currentPlayer);
         gameState = checkForWinner();
         switchPlayer();
@@ -39,7 +41,9 @@ public class SimpleSOSGameLogic extends SOSGameLogic {
     @Override
     public void makeHumanMove(int row, int col) {
         checkForValidMove(row, col);
-        executeMove(currentPlayer.makeMove(row, col));
+        Move move = currentPlayer.makeMove(row, col);
+        executeMove(move);
+        moveList.add(move);
         SOSGameUtils.checkForAndMarkCombination(gameBoard, currentPlayer);
         gameState = checkForWinner();
         switchPlayer();
