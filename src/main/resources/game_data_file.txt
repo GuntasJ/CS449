@@ -1,0 +1,22 @@
+Rules: 
+Each number represents the turn move and the letter represents whose turn it is.
+The letter and number after those will be the move the player makes. 
+
+For example: 
+    M1,TB---S=>(3,3)
+This means it is move 1 and blue's turn, and they played S at location 3,3 on the board.
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+
+
+SIMPLE
+M1,TR---S=>(1,1)
+M2,TB---S=>(1,3)
+M3,TR---S=>(2,1)
+M4,TB---O=>(2,3)
+M5,TR---S=>(2,4)
+M6,TB---O=>(3,3)
+M7,TR---S=>(4,3)
+M8,TB---O=>(4,0)
+M9,TR---S=>(1,0)
