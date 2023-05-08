@@ -369,9 +369,6 @@ public class GamePanel extends JPanel implements Runnable {
         add(centerPanel, BorderLayout.CENTER);
     }
 
-    //Getters for test code
-
-
     public JRadioButton getGameTypeSimpleRadioButton() {
         return gameTypeSimpleRadioButton;
     }
